@@ -3,7 +3,7 @@ import type { PricingTier, PricingConfig } from '@/types/wayforpay';
 export const PRICING: Record<PricingTier, PricingConfig> = {
   basic: {
     title: 'Базовий',
-    price: 799,
+    price: 5,
     originalPrice: 1200,
     features: [
       'Доступ до 12 модулів',
@@ -15,7 +15,7 @@ export const PRICING: Record<PricingTier, PricingConfig> = {
   },
   premium: {
     title: 'Преміум',
-    price: 7999,
+    price: 5,
     originalPrice: 12800,
     features: [
       'Все з Базового',
@@ -29,7 +29,7 @@ export const PRICING: Record<PricingTier, PricingConfig> = {
   },
   vip: {
     title: 'VIP',
-    price: 12999,
+    price: 5,
     originalPrice: 19999,
     features: [
       'Все з Преміум',

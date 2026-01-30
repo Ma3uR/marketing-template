@@ -62,6 +62,7 @@ Payment approved: premium_1706234567890
 You should be redirected to `/payment/success`
 
 ## Testing Telegram Notifications
+# Telegram Bot Notifications (optional)
 
 ### Setup
 
