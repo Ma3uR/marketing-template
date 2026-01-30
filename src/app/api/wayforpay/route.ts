@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       productName: productNames,
       productPrice: productPrices,
       productCount: productCounts,
-      returnUrl: `${APP_URL}/payment/success`,
+      returnUrl: `${APP_URL}/payment/success/callback`,
       serviceUrl: `${APP_URL}/api/wayforpay/callback`,
       language: 'UA',
     };
