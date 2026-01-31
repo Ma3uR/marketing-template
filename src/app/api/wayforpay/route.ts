@@ -3,10 +3,11 @@ import { generatePurchaseSignature, getMerchantConfig } from '@/lib/wayforpay';
 import { PRICING } from '@/lib/pricing';
 import type { PricingTier } from '@/types/wayforpay';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
-
 export async function POST(request: NextRequest) {
   try {
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
+    console.log('APP_URL from env:', APP_URL);
+
     const body = await request.json();
     const { tier } = body as { tier: PricingTier };
 
