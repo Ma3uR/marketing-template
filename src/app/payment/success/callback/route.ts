@@ -9,10 +9,12 @@ export async function POST(request: NextRequest) {
 
   const params = new URLSearchParams();
   if (orderReference) params.set('orderReference', orderReference);
-  if (transactionStatus) params.set('status', transactionStatus);
   if (reasonCode) params.set('reasonCode', reasonCode);
 
-  const redirectUrl = `/payment/success${params.toString() ? `?${params.toString()}` : ''}`;
+  // Redirect to failure page for declined/failed payments
+  const isSuccess = transactionStatus === 'Approved';
+  const basePath = isSuccess ? '/payment/success' : '/payment/failure';
+  const redirectUrl = `${basePath}${params.toString() ? `?${params.toString()}` : ''}`;
 
   return NextResponse.redirect(new URL(redirectUrl, request.url), 303);
 }

@@ -320,7 +320,7 @@ export function MarketingCourseLanding() {
               Т
             </div>
             <span className="text-xl font-bold tracking-tight">
-              Таня Свідоренко
+              Таня Сідоренко
             </span>
           </div>
 
@@ -571,7 +571,7 @@ export function MarketingCourseLanding() {
               </h2>
               <div className="space-y-6 text-gray-400 text-lg mb-8">
                 <p>
-                  Привіт! Я Таня Свідоренко, експерт із digital-маркетингу, і за
+                  Привіт! Я Таня Сідоренко, експерт із digital-маркетингу, і за
                   останні 7 років я допомогла сотням бізнесів перестати зливати
                   бюджети.
                 </p>
@@ -751,7 +751,7 @@ export function MarketingCourseLanding() {
                   Т
                 </div>
                 <span className="text-xl font-bold tracking-tight">
-                  Таня Свідоренко
+                  Таня Сідоренко
                 </span>
               </div>
               <p className="text-gray-500 max-w-xs leading-relaxed">
@@ -816,7 +816,7 @@ export function MarketingCourseLanding() {
             </div>
           </div>
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-600 text-sm">
-            <div>&copy; 2026 Таня Свідоренко. Всі права захищені.</div>
+            <div>&copy; 2026 Таня Сідоренко. Всі права захищені.</div>
             <div className="flex items-center gap-8">
               <a href="#" className="hover:text-gray-400">
                 Політика конфіденційності

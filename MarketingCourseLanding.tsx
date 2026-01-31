@@ -246,7 +246,7 @@ export const MarketingCourseLanding = () => {
         <div className="container mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] rounded-lg flex items-center justify-center font-bold">Т</div>
-            <span className="text-xl font-bold tracking-tight">Таня Свідоренко</span>
+            <span className="text-xl font-bold tracking-tight">Таня Сідоренко</span>
           </div>
           
           <nav className="hidden md:flex items-center gap-8">
@@ -444,7 +444,7 @@ export const MarketingCourseLanding = () => {
               <div className="text-[#fb7185] font-bold uppercase tracking-widest text-sm mb-4">Про автора</div>
               <h2 className="text-4xl font-bold mb-6">Ваша провідниця у світ прибуткової реклами</h2>
               <div className="space-y-6 text-gray-400 text-lg mb-8">
-                <p>Привіт! Я Таня Свідоренко, експерт із digital-маркетингу, і за останні 7 років я допомогла сотням бізнесів перестати зливати бюджети.</p>
+                <p>Привіт! Я Таня Сідоренко, експерт із digital-маркетингу, і за останні 7 років я допомогла сотням бізнесів перестати зливати бюджети.</p>
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3">
                     <CheckCircle2 className="text-[#a855f7] w-5 h-5" />
@@ -579,7 +579,7 @@ export const MarketingCourseLanding = () => {
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] rounded-lg flex items-center justify-center font-bold">Т</div>
-                <span className="text-xl font-bold tracking-tight">Таня Свідоренко</span>
+                <span className="text-xl font-bold tracking-tight">Таня Сідоренко</span>
               </div>
               <p className="text-gray-500 max-w-xs leading-relaxed">
                 Навчаємо підприємців будувати системний маркетинг без зайвих витрат на агентства.
@@ -604,7 +604,7 @@ export const MarketingCourseLanding = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-600 text-sm">
-            <div>© 2026 Таня Свідоренко. Всі права захищені.</div>
+            <div>© 2026 Таня Сідоренко. Всі права захищені.</div>
             <div className="flex items-center gap-8">
               <a href="#" className="hover:text-gray-400">Політика конфіденційності</a>
               <a href="#" className="hover:text-gray-400">Договір оферти</a>
