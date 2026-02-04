@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { PricingTier } from '@/types/wayforpay';
 
 interface CheckoutButtonProps {
@@ -11,6 +11,17 @@ interface CheckoutButtonProps {
 
 export function CheckoutButton({ tier, label, isPopular }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setLoading(false);
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
   const handlePayment = async () => {
     setLoading(true);
@@ -28,7 +39,6 @@ export function CheckoutButton({ tier, label, isPopular }: CheckoutButtonProps) 
 
       const data = await response.json();
 
-      // Create and submit form
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = 'https://secure.wayforpay.com/pay';
@@ -54,8 +64,7 @@ export function CheckoutButton({ tier, label, isPopular }: CheckoutButtonProps) 
 
       document.body.appendChild(form);
       form.submit();
-    } catch (error) {
-      console.error('Payment error:', error);
+    } catch {
       alert('Не вдалося ініціалізувати оплату. Спробуйте ще раз.');
       setLoading(false);
     }

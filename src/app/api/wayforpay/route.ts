@@ -7,8 +7,14 @@ export async function POST(request: NextRequest) {
   try {
     // Get origin from request headers (more reliable than env var)
     const origin = request.headers.get('origin') || request.headers.get('referer')?.replace(/\/$/, '').split('/').slice(0, 3).join('/');
-    const APP_URL = origin || process.env.NEXT_PUBLIC_APP_URL!;
-    console.log('APP_URL:', APP_URL, '| Origin:', origin, '| Env:', process.env.NEXT_PUBLIC_APP_URL);
+    const APP_URL = origin || process.env.NEXT_PUBLIC_APP_URL;
+
+    if (!APP_URL) {
+      return NextResponse.json(
+        { error: 'Application URL not configured' },
+        { status: 500 }
+      );
+    }
 
     const body = await request.json();
     const { tier } = body as { tier: PricingTier };
@@ -55,9 +61,6 @@ export async function POST(request: NextRequest) {
       serviceUrl: `${APP_URL}/api/wayforpay/callback`,
       language: 'UA',
     };
-
-    // Debug logging
-    console.log('WayForPay Request:', formData);
 
     return NextResponse.json(formData);
   } catch (error) {
