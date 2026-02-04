@@ -32,9 +32,9 @@ export function PricingCard({
       whileInView={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay }}
       viewport={{ once: true }}
-      className={`relative flex flex-col p-8 rounded-3xl border transition-all ${
+      className={`relative flex flex-col p-6 sm:p-8 rounded-3xl border transition-all ${
         isPopular
-          ? 'bg-gradient-to-b from-[#1a0d2e] to-[#2d1b4e] border-[#a855f7] shadow-[0_0_30px_rgba(168,85,247,0.2)] scale-105 z-10'
+          ? 'bg-gradient-to-b from-[#1a0d2e] to-[#2d1b4e] border-[#a855f7] shadow-[0_0_30px_rgba(168,85,247,0.2)] lg:scale-105 z-10 sm:col-span-2 lg:col-span-1 sm:max-w-md sm:mx-auto lg:max-w-none'
           : 'bg-[#1a0d2e]/40 border-purple-500/20'
       }`}
     >

@@ -63,7 +63,7 @@ const BenefitCard = ({
       <Icon className="w-6 h-6 text-[#a855f7]" />
     </div>
     <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-    <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+    <p className="text-gray-300 text-sm leading-relaxed">{description}</p>
   </motion.div>
 );
 
@@ -381,7 +381,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={sectionVariants}
           viewport={{ once: true, amount: 0.2 }}
-          className="container mx-auto px-6 pt-16 pb-32 flex flex-col lg:flex-row items-center justify-between gap-12"
+          className="container mx-auto px-6 pt-8 pb-16 sm:pt-16 sm:pb-24 lg:pb-32 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12"
         >
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -393,7 +393,7 @@ export function MarketingCourseLanding() {
               <Star className="w-4 h-4 fill-purple-300" />
               <span>Вже навчились 500+ підприємців</span>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight mb-6 break-words">
               Перестань{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d946ef] to-[#fb7185]">
                 переплачувати
@@ -442,34 +442,34 @@ export function MarketingCourseLanding() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="flex-1 relative"
+            className="flex-1 relative w-full max-w-md lg:max-w-none mx-auto"
           >
             <div className="relative z-10 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1288&auto=format&fit=crop"
                 alt="Marketing Coach"
-                className="w-full h-auto object-cover max-h-[600px]"
+                className="w-full h-auto object-cover max-h-[400px] sm:max-h-[500px] lg:max-h-[600px]"
               />
             </div>
             {/* Floating UI Elements */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-6 -right-6 bg-[#1a0d2e]/90 border border-white/10 p-4 rounded-2xl backdrop-blur-md shadow-xl z-20"
+              className="absolute -top-4 -right-2 sm:-top-6 sm:-right-6 bg-[#1a0d2e]/90 border border-white/10 p-3 sm:p-4 rounded-2xl backdrop-blur-md shadow-xl z-20"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400">
-                  <TrendingUp className="w-4 h-4" />
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400">
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                  <div className="text-[8px] sm:text-[10px] text-gray-400 uppercase font-bold tracking-wider">
                     ROI
                   </div>
-                  <div className="text-lg font-bold text-white">+248%</div>
+                  <div className="text-sm sm:text-lg font-bold text-white">+248%</div>
                 </div>
               </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 sm:h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full w-3/4 bg-green-500" />
               </div>
             </motion.div>
@@ -482,12 +482,12 @@ export function MarketingCourseLanding() {
                 ease: 'easeInOut',
                 delay: 1,
               }}
-              className="absolute bottom-12 -left-12 bg-[#1a0d2e]/90 border border-white/10 p-4 rounded-2xl backdrop-blur-md shadow-xl z-20 flex items-center gap-4"
+              className="absolute bottom-8 -left-2 sm:bottom-12 sm:-left-12 bg-[#1a0d2e]/90 border border-white/10 p-3 sm:p-4 rounded-2xl backdrop-blur-md shadow-xl z-20 flex items-center gap-3 sm:gap-4"
             >
-              <Instagram className="w-8 h-8 text-[#d946ef]" />
+              <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#d946ef]" />
               <div>
-                <div className="text-xs text-gray-400">Нових лідів</div>
-                <div className="font-bold">+1,240</div>
+                <div className="text-[10px] sm:text-xs text-gray-400">Нових лідів</div>
+                <div className="text-sm sm:text-base font-bold">+1,240</div>
               </div>
             </motion.div>
 
@@ -502,7 +502,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={createSlideVariants('right')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-32 bg-[#1a0d2e]/30 relative overflow-hidden"
+          className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/30 relative overflow-hidden"
         >
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-16">
@@ -529,7 +529,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={createSlideVariants('left')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-32 container mx-auto px-6 overflow-hidden"
+          className="py-16 sm:py-24 lg:py-32 container mx-auto px-6 overflow-hidden"
         >
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <motion.div
@@ -537,7 +537,7 @@ export function MarketingCourseLanding() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="lg:w-2/5 relative"
+              className="w-full max-w-sm mx-auto lg:mx-0 lg:w-2/5 relative"
             >
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#d946ef]/20 rounded-full blur-3xl" />
               <div className="relative rounded-3xl overflow-hidden aspect-[4/5] border border-white/10 z-10">
@@ -548,9 +548,9 @@ export function MarketingCourseLanding() {
                   className="w-full h-full object-cover grayscale-[0.2]"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] p-6 rounded-2xl z-20">
-                <div className="text-3xl font-bold">7 років</div>
-                <div className="text-xs uppercase tracking-widest font-medium opacity-80">
+              <div className="absolute -bottom-4 -right-2 sm:-bottom-6 sm:-right-6 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] p-4 sm:p-6 rounded-2xl z-20">
+                <div className="text-2xl sm:text-3xl font-bold">7 років</div>
+                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-medium opacity-80">
                   Досвіду в Digital
                 </div>
               </div>
@@ -613,7 +613,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={createSlideVariants('right')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-32 bg-[#1a0d2e]/40 relative"
+          className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/40 relative"
         >
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -625,7 +625,7 @@ export function MarketingCourseLanding() {
                 масштабів.
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-6xl mx-auto">
               {pricing.map((tier, i) => (
                 <PricingCard key={tier.tier} {...tier} delay={i * 0.15} />
               ))}
@@ -640,7 +640,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={createSlideVariants('left')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-32 container mx-auto px-6"
+          className="py-16 sm:py-24 lg:py-32 container mx-auto px-6"
         >
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Що кажуть наші учні</h2>
@@ -694,7 +694,7 @@ export function MarketingCourseLanding() {
           whileInView="visible"
           variants={createSlideVariants('right')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-32 px-6"
+          className="py-16 sm:py-24 lg:py-32 px-6"
         >
           <div className="container mx-auto">
             <motion.div
