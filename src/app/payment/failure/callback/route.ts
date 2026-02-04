@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const formData = await request.formData();
 
@@ -13,8 +13,10 @@ export async function POST(request: NextRequest) {
 
     const redirectUrl = `/payment/failure${params.toString() ? `?${params.toString()}` : ''}`;
 
-    return NextResponse.redirect(new URL(redirectUrl, request.url), 303);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
+    return NextResponse.redirect(new URL(redirectUrl, baseUrl), 303);
   } catch {
-    return NextResponse.redirect(new URL('/payment/failure', request.url), 303);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
+    return NextResponse.redirect(new URL('/payment/failure', baseUrl), 303);
   }
 }
