@@ -5,10 +5,8 @@ import type { PricingTier } from '@/types/wayforpay';
 
 export async function POST(request: NextRequest) {
   try {
-    // Get origin from request headers (more reliable than env var)
-    const origin = request.headers.get('origin') || request.headers.get('referer')?.replace(/\/$/, '').split('/').slice(0, 3).join('/');
-    const APP_URL = origin || process.env.NEXT_PUBLIC_APP_URL!;
-    console.log('APP_URL:', APP_URL, '| Origin:', origin, '| Env:', process.env.NEXT_PUBLIC_APP_URL);
+    // Use trusted environment variable for redirect URLs to prevent open redirect attacks
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
     const body = await request.json();
     const { tier } = body as { tier: PricingTier };

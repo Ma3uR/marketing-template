@@ -1,12 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-function getBaseUrl(request: NextRequest): string {
-  const host = request.headers.get('host');
-  const protocol = request.headers.get('x-forwarded-proto') || 'https';
-  return `${protocol}://${host}`;
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const formData = await request.formData();
 
   const orderReference = formData.get('orderReference') as string | null;
@@ -22,6 +16,6 @@ export async function POST(request: NextRequest) {
   const basePath = isSuccess ? '/payment/success' : '/payment/failure';
   const redirectUrl = `${basePath}${params.toString() ? `?${params.toString()}` : ''}`;
 
-  const baseUrl = getBaseUrl(request);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
   return NextResponse.redirect(new URL(redirectUrl, baseUrl), 303);
 }
