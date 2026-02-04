@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
 import {
   CheckCircle2,
   TrendingUp,
@@ -324,7 +325,7 @@ export function MarketingCourseLanding() {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8" aria-label="Основна навігація">
             <NavLink href="#benefits">Переваги</NavLink>
             <NavLink href="#about">Про автора</NavLink>
             <NavLink href="#pricing">Тарифи</NavLink>
@@ -337,8 +338,10 @@ export function MarketingCourseLanding() {
           <button
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </button>
         </div>
       </header>
@@ -351,6 +354,9 @@ export function MarketingCourseLanding() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             className="fixed inset-0 z-40 bg-[#0f0a1f] flex flex-col items-center justify-center gap-8 md:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Навігаційне меню"
           >
             <NavLink href="#benefits" onClick={closeMobileMenu}>
               Переваги
@@ -416,12 +422,14 @@ export function MarketingCourseLanding() {
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="w-8 h-8 rounded-full border-2 border-[#0f0a1f] bg-gray-600 flex items-center justify-center overflow-hidden"
+                      className="w-8 h-8 rounded-full border-2 border-[#0f0a1f] bg-gray-600 flex items-center justify-center overflow-hidden relative"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={`https://i.pravatar.cc/100?img=${i + 10}`}
-                        alt="avatar"
+                        alt={`Фото учня ${i}`}
+                        fill
+                        sizes="32px"
+                        className="object-cover"
                       />
                     </div>
                   ))}
@@ -444,12 +452,14 @@ export function MarketingCourseLanding() {
             transition={{ duration: 1, delay: 0.2 }}
             className="flex-1 relative"
           >
-            <div className="relative z-10 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative z-10 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] max-h-[600px]">
+              <Image
                 src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1288&auto=format&fit=crop"
-                alt="Marketing Coach"
-                className="w-full h-auto object-cover max-h-[600px]"
+                alt="Маркетинг коуч"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+                priority
               />
             </div>
             {/* Floating UI Elements */}
@@ -541,11 +551,12 @@ export function MarketingCourseLanding() {
             >
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#d946ef]/20 rounded-full blur-3xl" />
               <div className="relative rounded-3xl overflow-hidden aspect-[4/5] border border-white/10 z-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?q=80&w=1280&auto=format&fit=crop"
-                  alt="Instructor"
-                  className="w-full h-full object-cover grayscale-[0.2]"
+                  alt="Таня Сідоренко - інструктор курсу"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover grayscale-[0.2]"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] p-6 rounded-2xl z-20">
@@ -662,12 +673,13 @@ export function MarketingCourseLanding() {
                 className="bg-[#1a0d2e]/60 border border-white/5 p-8 rounded-3xl relative"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] p-0.5 overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] p-0.5 overflow-hidden relative">
+                    <Image
                       src={`https://i.pravatar.cc/150?u=${t.name}`}
-                      alt={t.name}
-                      className="w-full h-full rounded-full object-cover"
+                      alt={`Фото ${t.name}`}
+                      fill
+                      sizes="56px"
+                      className="rounded-full object-cover"
                     />
                   </div>
                   <div>
@@ -790,7 +802,7 @@ export function MarketingCourseLanding() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="#reviews"
                     className="text-gray-500 hover:text-white transition-colors"
                   >
                     Контакти
@@ -817,14 +829,14 @@ export function MarketingCourseLanding() {
           </div>
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-600 text-sm">
             <div>&copy; 2026 Таня Сідоренко. Всі права захищені.</div>
-            <div className="flex items-center gap-8">
-              <a href="#" className="hover:text-gray-400">
+            <nav className="flex items-center gap-8" aria-label="Правова інформація">
+              <a href="/privacy" className="hover:text-gray-400">
                 Політика конфіденційності
               </a>
-              <a href="#" className="hover:text-gray-400">
+              <a href="/terms" className="hover:text-gray-400">
                 Договір оферти
               </a>
-            </div>
+            </nav>
           </div>
         </div>
       </motion.footer>
