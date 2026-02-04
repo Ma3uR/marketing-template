@@ -5,13 +5,14 @@ import type { PricingTier } from '@/types/wayforpay';
 
 export async function POST(request: NextRequest) {
   try {
-    // Get origin from request headers (more reliable than env var)
-    const origin = request.headers.get('origin') || request.headers.get('referer')?.replace(/\/$/, '').split('/').slice(0, 3).join('/');
-    const APP_URL = origin || process.env.NEXT_PUBLIC_APP_URL;
+    // Use only the trusted environment variable for redirect URLs
+    // Never trust client-provided Origin/Referer headers for security-sensitive redirects
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
     if (!APP_URL) {
+      console.error('NEXT_PUBLIC_APP_URL environment variable is not configured');
       return NextResponse.json(
-        { error: 'Application URL not configured' },
+        { error: 'Server configuration error' },
         { status: 500 }
       );
     }

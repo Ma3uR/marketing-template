@@ -63,9 +63,9 @@ export async function POST(request: NextRequest) {
       signature,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Callback processing failed:', error);
     return NextResponse.json(
-      { error: `Callback processing failed: ${message}` },
+      { error: 'Callback processing failed' },
       { status: 500 }
     );
   }
