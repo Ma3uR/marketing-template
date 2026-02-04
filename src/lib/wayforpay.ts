@@ -1,14 +1,21 @@
 import crypto from 'crypto';
 import type { WayForPayCallback } from '@/types/wayforpay';
 
-const MERCHANT_SECRET = process.env.WAYFORPAY_MERCHANT_SECRET!;
-const MERCHANT_LOGIN = process.env.WAYFORPAY_MERCHANT_LOGIN!;
-const MERCHANT_DOMAIN = process.env.WAYFORPAY_MERCHANT_DOMAIN!;
+function getRequiredEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(
+      `Missing required environment variable: ${name}. Please check your .env file.`
+    );
+  }
+  return value;
+}
 
 export function generateSignature(data: string[]): string {
+  const merchantSecret = getRequiredEnvVar('WAYFORPAY_MERCHANT_SECRET');
   const signString = data.join(';');
   return crypto
-    .createHmac('md5', MERCHANT_SECRET)
+    .createHmac('md5', merchantSecret)
     .update(signString, 'utf8')
     .digest('hex');
 }
@@ -22,9 +29,12 @@ export function generatePurchaseSignature(params: {
   productCounts: number[];
   productPrices: number[];
 }): string {
+  const merchantLogin = getRequiredEnvVar('WAYFORPAY_MERCHANT_LOGIN');
+  const merchantDomain = getRequiredEnvVar('WAYFORPAY_MERCHANT_DOMAIN');
+
   const signatureData = [
-    MERCHANT_LOGIN,
-    MERCHANT_DOMAIN,
+    merchantLogin,
+    merchantDomain,
     params.orderReference,
     params.orderDate.toString(),
     params.amount.toString(),
@@ -86,7 +96,7 @@ export function verifyCallbackSignature(callback: WayForPayCallback): boolean {
 
 export function getMerchantConfig() {
   return {
-    login: MERCHANT_LOGIN,
-    domain: MERCHANT_DOMAIN,
+    login: getRequiredEnvVar('WAYFORPAY_MERCHANT_LOGIN'),
+    domain: getRequiredEnvVar('WAYFORPAY_MERCHANT_DOMAIN'),
   };
 }

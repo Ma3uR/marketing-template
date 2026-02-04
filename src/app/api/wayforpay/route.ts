@@ -5,8 +5,17 @@ import type { PricingTier } from '@/types/wayforpay';
 
 export async function POST(request: NextRequest) {
   try {
-    const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
-    console.log('APP_URL from env:', APP_URL);
+    // Use only the trusted environment variable for redirect URLs
+    // Never trust client-provided Origin/Referer headers for security-sensitive redirects
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
+
+    if (!APP_URL) {
+      console.error('NEXT_PUBLIC_APP_URL environment variable is not configured');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
 
     const body = await request.json();
     const { tier } = body as { tier: PricingTier };
@@ -53,9 +62,6 @@ export async function POST(request: NextRequest) {
       serviceUrl: `${APP_URL}/api/wayforpay/callback`,
       language: 'UA',
     };
-
-    // Debug logging
-    console.log('WayForPay Request:', formData);
 
     return NextResponse.json(formData);
   } catch (error) {
