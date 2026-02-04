@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+function getBaseUrl(request: NextRequest): string {
+  const host = request.headers.get('host');
+  const protocol = request.headers.get('x-forwarded-proto') || 'https';
+  return `${protocol}://${host}`;
+}
+
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
 
@@ -12,5 +18,6 @@ export async function POST(request: NextRequest) {
 
   const redirectUrl = `/payment/failure${params.toString() ? `?${params.toString()}` : ''}`;
 
-  return NextResponse.redirect(new URL(redirectUrl, request.url), 303);
+  const baseUrl = getBaseUrl(request);
+  return NextResponse.redirect(new URL(redirectUrl, baseUrl), 303);
 }
