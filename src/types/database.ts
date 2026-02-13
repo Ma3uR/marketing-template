@@ -61,6 +61,43 @@ export interface EmailTemplateUpdate {
   updated_at?: string;
 }
 
+export interface Review {
+  id: string;
+  author_name: string;
+  author_photo_url: string | null;
+  rating: number;
+  text: string;
+  business: string | null;
+  result: string | null;
+  is_visible: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewInsert {
+  author_name: string;
+  author_photo_url?: string | null;
+  rating?: number;
+  text: string;
+  business?: string | null;
+  result?: string | null;
+  is_visible?: boolean;
+  sort_order?: number;
+}
+
+export interface ReviewUpdate {
+  author_name?: string;
+  author_photo_url?: string | null;
+  rating?: number;
+  text?: string;
+  business?: string | null;
+  result?: string | null;
+  is_visible?: boolean;
+  sort_order?: number;
+  updated_at?: string;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -79,6 +116,11 @@ export type Database = {
         Row: EmailTemplate;
         Insert: EmailTemplateInsert;
         Update: EmailTemplateUpdate;
+      };
+      reviews: {
+        Row: Review;
+        Insert: ReviewInsert;
+        Update: ReviewUpdate;
       };
       admin_users: {
         Row: AdminUser;

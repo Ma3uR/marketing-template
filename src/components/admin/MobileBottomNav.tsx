@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Mail, User } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Mail, Star, User } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin', icon: LayoutDashboard },
   { href: '/admin/orders', icon: ShoppingBag },
   { href: '/admin/emails', icon: Mail },
+  { href: '/admin/reviews', icon: Star },
 ] as const;
 
 export default function MobileBottomNav() {
