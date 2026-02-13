@@ -37,13 +37,14 @@ async function getOrders(searchParams: SearchParams) {
 
   if (error) {
     console.error('Error fetching orders:', error);
-    return { orders: [], totalPages: 1, currentPage: page };
+    return { orders: [], totalPages: 1, currentPage: page, totalCount: 0 };
   }
 
   return {
     orders: (data || []) as Order[],
     totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
     currentPage: page,
+    totalCount: count || 0,
   };
 }
 
@@ -53,15 +54,13 @@ export default async function OrdersPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const { orders, totalPages, currentPage } = await getOrders(params);
+  const { orders, totalPages, currentPage, totalCount } = await getOrders(params);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Замовлення</h1>
-        <p className="text-gray-400 mt-1">
-          Перегляд та фільтрація всіх замовлень
-        </p>
+        <h1 className="text-3xl font-bold text-white mb-2">Замовлення</h1>
+        <p className="text-gray-500">Перегляд та фільтрація всіх замовлень</p>
       </div>
 
       <OrdersFilter
@@ -74,6 +73,7 @@ export default async function OrdersPage({
         showPagination
         currentPage={currentPage}
         totalPages={totalPages}
+        totalCount={totalCount}
       />
     </div>
   );

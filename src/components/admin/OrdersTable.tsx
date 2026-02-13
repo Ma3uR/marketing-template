@@ -1,148 +1,135 @@
 'use client';
 
-import { Order } from '@/types/database';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { Order } from '@/types/database';
+import GlassCard from './GlassCard';
+import StatusPill from './StatusPill';
 
 interface OrdersTableProps {
   orders: Order[];
   showPagination?: boolean;
   currentPage?: number;
   totalPages?: number;
-  onPageChange?: (page: number) => void;
+  totalCount?: number;
 }
 
-const statusColors: Record<string, string> = {
-  Approved: 'bg-green-500/20 text-green-400 border-green-500/30',
-  Declined: 'bg-red-500/20 text-red-400 border-red-500/30',
-  Refunded: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  InProcessing: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  Expired: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-};
-
-const statusLabels: Record<string, string> = {
-  Approved: 'Оплачено',
-  Declined: 'Відхилено',
-  Refunded: 'Повернено',
-  InProcessing: 'В обробці',
-  Expired: 'Прострочено',
-};
+const ITEMS_PER_PAGE = 20;
 
 export default function OrdersTable({
   orders,
   showPagination,
   currentPage = 1,
   totalPages = 1,
-  onPageChange,
+  totalCount,
 }: OrdersTableProps) {
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMM yyyy, HH:mm', { locale: uk });
+  const searchParams = useSearchParams();
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    return `/admin/orders?${params.toString()}`;
   };
 
-  const formatAmount = (amount: number, currency: string) => {
-    return `${amount.toLocaleString('uk-UA')} ${currency}`;
-  };
+  const rangeStart = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const rangeEnd = Math.min(currentPage * ITEMS_PER_PAGE, totalCount || orders.length);
 
   if (orders.length === 0) {
     return (
-      <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-gray-700 p-8 text-center">
+      <GlassCard className="p-8 text-center">
         <p className="text-gray-400">Замовлень поки немає</p>
-      </div>
+      </GlassCard>
     );
   }
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-gray-700 overflow-hidden">
+    <GlassCard className="p-0">
+      {showPagination && totalCount && (
+        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <p className="text-gray-400 text-sm">
+            Показано <span className="text-white font-bold">{rangeStart}-{rangeEnd}</span> з{' '}
+            <span className="text-white font-bold">{totalCount}</span> замовлень
+          </p>
+          <div className="flex gap-1">
+            {currentPage > 1 ? (
+              <Link
+                href={buildPageUrl(currentPage - 1)}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-gray-400" />
+              </Link>
+            ) : (
+              <span className="p-2 rounded-lg bg-white/5 opacity-50 cursor-not-allowed">
+                <ChevronLeft className="w-4 h-4 text-gray-400" />
+              </span>
+            )}
+            {currentPage < totalPages ? (
+              <Link
+                href={buildPageUrl(currentPage + 1)}
+                className="p-2 rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <span className="p-2 rounded-lg bg-rose-500/50 text-white/50 cursor-not-allowed">
+                <ChevronRight className="w-4 h-4" />
+              </span>
+            )}
+          </div>
+        </div>
+      )}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-gray-700">
-              <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
-                Дата
-              </th>
-              <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
-                Клієнт
-              </th>
-              <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
-                Продукт
-              </th>
-              <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
-                Сума
-              </th>
-              <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
-                Статус
-              </th>
+            <tr className="bg-white/[0.02] text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-6 py-4 font-semibold">Дата та час</th>
+              <th className="px-6 py-4 font-semibold">ID Замовлення</th>
+              <th className="px-6 py-4 font-semibold">Клієнт</th>
+              <th className="px-6 py-4 font-semibold">Email</th>
+              <th className="px-6 py-4 font-semibold">Продукт</th>
+              <th className="px-6 py-4 font-semibold">Сума</th>
+              <th className="px-6 py-4 font-semibold text-center">Статус</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-gray-300 divide-y divide-white/5">
             {orders.map((order) => (
               <tr
                 key={order.id}
-                className="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors"
+                className="hover:bg-white/[0.02] transition-all cursor-pointer"
               >
-                <td className="py-4 px-6">
-                  <span className="text-sm text-gray-300">
-                    {formatDate(order.created_at)}
-                  </span>
+                <td className="px-6 py-5 text-sm">
+                  {format(new Date(order.created_at), 'dd.MM.yyyy, HH:mm', {
+                    locale: uk,
+                  })}
                 </td>
-                <td className="py-4 px-6">
-                  <div>
-                    <p className="text-sm text-white">
-                      {order.customer_name || 'Невідомо'}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {order.customer_email || order.customer_phone || '—'}
-                    </p>
+                <td className="px-6 py-5 font-mono text-xs text-rose-400">
+                  #{order.order_reference}
+                </td>
+                <td className="px-6 py-5 font-medium text-white">
+                  {order.customer_name || 'Невідомо'}
+                </td>
+                <td className="px-6 py-5 text-sm text-gray-500">
+                  {order.customer_email || '—'}
+                </td>
+                <td className="px-6 py-5 text-sm">
+                  {order.product_name || '—'}
+                </td>
+                <td className="px-6 py-5 font-bold text-white whitespace-nowrap">
+                  ₴ {Number(order.amount).toLocaleString('uk-UA')}
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex justify-center">
+                    <StatusPill status={order.status} />
                   </div>
-                </td>
-                <td className="py-4 px-6">
-                  <span className="text-sm text-gray-300">
-                    {order.product_name || '—'}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span className="text-sm font-medium text-white">
-                    {formatAmount(Number(order.amount), order.currency)}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                      statusColors[order.status] || statusColors.Expired
-                    }`}
-                  >
-                    {statusLabels[order.status] || order.status}
-                  </span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {showPagination && totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-700">
-          <p className="text-sm text-gray-400">
-            Сторінка {currentPage} з {totalPages}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onPageChange?.(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="px-3 py-1 text-sm bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-            >
-              Назад
-            </button>
-            <button
-              onClick={() => onPageChange?.(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="px-3 py-1 text-sm bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-            >
-              Вперед
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    </GlassCard>
   );
 }

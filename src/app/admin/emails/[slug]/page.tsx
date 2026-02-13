@@ -25,7 +25,6 @@ export default async function EditTemplatePage({
 }) {
   const { slug } = await params;
 
-  // Handle "new" template case
   if (slug === 'new') {
     const newTemplate: Partial<EmailTemplate> = {
       slug: '',
@@ -38,7 +37,7 @@ export default async function EditTemplatePage({
   <style>
     body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #8B5CF6, #D946EF); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .header { background: linear-gradient(135deg, #fb7185, #d946ef); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
     .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
     .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
   </style>
@@ -53,7 +52,7 @@ export default async function EditTemplatePage({
       <p>Ваш контент тут...</p>
     </div>
     <div class="footer">
-      <p>© 2024 Курс Маркетингу. Всі права захищені.</p>
+      <p>&copy; 2026 Курс Маркетингу. Всі права захищені.</p>
     </div>
   </div>
 </body>
@@ -62,17 +61,7 @@ export default async function EditTemplatePage({
       is_active: true,
     };
 
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Новий шаблон</h1>
-          <p className="text-gray-400 mt-1">
-            Створення нового email шаблону
-          </p>
-        </div>
-        <EmailEditor template={newTemplate as EmailTemplate} isNew />
-      </div>
-    );
+    return <EmailEditor template={newTemplate as EmailTemplate} isNew />;
   }
 
   const template = await getTemplate(slug);
@@ -81,15 +70,5 @@ export default async function EditTemplatePage({
     notFound();
   }
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">{template.name}</h1>
-        <p className="text-gray-400 mt-1">
-          Редагування шаблону &quot;{template.slug}&quot;
-        </p>
-      </div>
-      <EmailEditor template={template} />
-    </div>
-  );
+  return <EmailEditor template={template} />;
 }

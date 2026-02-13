@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { replaceTemplateVariables } from '@/lib/email-templates';
-import { Save, Eye, EyeOff, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
+import { Save, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
 import type { EmailTemplate } from '@/types/database';
+import GlassCard from './GlassCard';
 
 interface EmailEditorProps {
   template: EmailTemplate;
@@ -33,7 +34,7 @@ export default function EmailEditor({ template, isNew }: EmailEditorProps) {
     variables: template.variables || [],
     is_active: template.is_active,
   });
-  const [showPreview, setShowPreview] = useState(true);
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -118,21 +119,30 @@ export default function EmailEditor({ template, isNew }: EmailEditorProps) {
   const previewHtml = replaceTemplateVariables(formData.body_html, sampleVariables);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => router.push('/admin/emails')}
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Назад до списку
-        </button>
-        <div className="flex items-center gap-3">
+    <div className="h-full flex flex-col space-y-6">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/admin/emails')}
+            className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-white">
+              {isNew ? 'Новий шаблон' : 'Редактор шаблону'}
+            </h2>
+            <p className="text-gray-500 text-sm">
+              {isNew ? 'Створення нового email шаблону' : formData.name}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3 w-full md:w-auto">
           {!isNew && (
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="inline-flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+              className="flex-1 md:flex-none px-6 py-3 bg-white/5 text-red-400 font-bold rounded-xl hover:bg-red-500/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {deleting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -145,164 +155,164 @@ export default function EmailEditor({ template, isNew }: EmailEditorProps) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-rose-500 to-fuchsia-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-rose-500/20 transition-all disabled:opacity-50"
           >
-            {saving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
+            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             {isNew ? 'Створити' : 'Зберегти'}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
           {error}
         </div>
       )}
-
       {success && (
-        <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400">
+        <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400">
           {success}
         </div>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Editor */}
-        <div className="space-y-4">
-          <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-gray-700 p-6 space-y-4">
-            {isNew && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Slug (ідентифікатор)
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1">
+        <GlassCard className="flex flex-col gap-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  Slug
                 </label>
                 <input
                   type="text"
                   value={formData.slug}
-                  onChange={(e) =>
-                    setFormData({ ...formData, slug: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                  placeholder="purchase_confirmation"
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  disabled={!isNew}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50 disabled:opacity-50 transition-all"
                 />
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Назва шаблону
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                placeholder="Підтвердження покупки"
-              />
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  Назва
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all"
+                />
+              </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                 Тема листа
               </label>
               <input
                 type="text"
                 value={formData.subject}
-                onChange={(e) =>
-                  setFormData({ ...formData, subject: e.target.value })
-                }
-                className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                placeholder="Дякуємо за покупку!"
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all"
               />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-300">
-                  HTML контент
-                </label>
-                <div className="flex items-center gap-2">
-                  {['customer_name', 'product_name', 'amount', 'order_reference'].map(
-                    (v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        onClick={() => insertVariable(v)}
-                        className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition-colors"
-                      >
-                        {`{{${v}}}`}
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
-              <textarea
-                id="body_html"
-                value={formData.body_html}
-                onChange={(e) =>
-                  setFormData({ ...formData, body_html: e.target.value })
-                }
-                rows={20}
-                className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"
-                placeholder="<!DOCTYPE html>..."
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.is_active}
-                  onChange={(e) =>
-                    setFormData({ ...formData, is_active: e.target.checked })
-                  }
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-500/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-              </label>
-              <span className="text-sm text-gray-300">Активний</span>
             </div>
           </div>
-        </div>
 
-        {/* Preview */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-white">Попередній перегляд</h3>
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              {showPreview ? (
-                <>
-                  <EyeOff className="w-4 h-4" />
-                  Сховати
-                </>
-              ) : (
-                <>
-                  <Eye className="w-4 h-4" />
-                  Показати
-                </>
+          <div className="flex-1 flex flex-col space-y-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+              Вміст (HTML/Text)
+            </label>
+            <textarea
+              id="body_html"
+              value={formData.body_html}
+              onChange={(e) => setFormData({ ...formData, body_html: e.target.value })}
+              className="flex-1 min-h-[300px] w-full bg-black/40 border border-white/10 rounded-xl p-6 text-white font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-500/30 transition-all"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs font-bold text-gray-600">ДОСТУПНІ ЗМІННІ</p>
+            <div className="flex flex-wrap gap-2">
+              {['customer_name', 'product_name', 'amount', 'order_reference'].map(
+                (tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => insertVariable(tag)}
+                    className="text-xs bg-white/5 hover:bg-white/10 text-gray-400 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    {'{{' + tag + '}}'}
+                  </button>
+                )
               )}
-            </button>
+            </div>
           </div>
 
-          {showPreview && (
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg">
-              <div className="p-4 bg-gray-100 border-b text-sm text-gray-600">
-                <strong>Тема:</strong>{' '}
-                {replaceTemplateVariables(formData.subject, sampleVariables)}
-              </div>
-              <div
-                className="p-0"
-                dangerouslySetInnerHTML={{ __html: previewHtml }}
+          <div className="flex items-center gap-3">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.is_active}
+                onChange={(e) =>
+                  setFormData({ ...formData, is_active: e.target.checked })
+                }
+                className="sr-only peer"
               />
+              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-500/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+            </label>
+            <span className="text-sm text-gray-300">Активний</span>
+          </div>
+        </GlassCard>
+
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-center">
+            <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
+              <button
+                onClick={() => setPreviewMode('desktop')}
+                className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                  previewMode === 'desktop'
+                    ? 'bg-rose-500 text-white shadow-lg'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                Desktop
+              </button>
+              <button
+                onClick={() => setPreviewMode('mobile')}
+                className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                  previewMode === 'mobile'
+                    ? 'bg-rose-500 text-white shadow-lg'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                Mobile
+              </button>
             </div>
-          )}
+          </div>
+
+          <div
+            className={`flex-1 overflow-hidden transition-all duration-300 ${
+              previewMode === 'mobile' ? 'max-w-[375px] mx-auto' : 'w-full'
+            }`}
+          >
+            <GlassCard className="h-full p-0 flex flex-col border-white/20">
+              <div className="bg-white/10 px-6 py-4 flex items-center justify-between">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">
+                  Email Preview Mode
+                </div>
+                <div className="w-10" />
+              </div>
+              <div className="bg-white px-4 py-6 h-full overflow-auto">
+                <div className="text-sm text-gray-600 mb-4 pb-4 border-b border-gray-200">
+                  <strong>Тема:</strong>{' '}
+                  {replaceTemplateVariables(formData.subject, sampleVariables)}
+                </div>
+                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              </div>
+            </GlassCard>
+          </div>
         </div>
       </div>
     </div>
