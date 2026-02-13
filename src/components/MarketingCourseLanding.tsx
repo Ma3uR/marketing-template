@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { PricingCard } from './PricingCard';
 import type { PricingTier } from '@/types/wayforpay';
+import type { Review } from '@/types/database';
 
 const NavLink = ({
   href,
@@ -78,7 +79,11 @@ interface PricingData {
   urgency?: string;
 }
 
-export function MarketingCourseLanding() {
+interface MarketingCourseLandingProps {
+  reviews: Review[];
+}
+
+export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -175,26 +180,10 @@ export function MarketingCourseLanding() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: 'Олена',
-      business: 'Магазин декору',
-      text: 'Зекономила 5000 грн на послугах таргетолога вже в перший місяць. Результати кращі, ніж були раніше!',
-      result: 'Зекономила 5000 грн',
-    },
-    {
-      name: 'Андрій',
-      business: 'IT-консалтинг',
-      text: 'Завдяки курсу ми масштабували продажі на 40%. Нарешті є чітка система, а не гадання на кавовій гущі.',
-      result: '+40% до продажів',
-    },
-    {
-      name: 'Марія',
-      business: "Б'юті студія",
-      text: 'Найкраща інвестиція року. Реклама окупилася вже на другому тижні навчання. Дякую за підтримку!',
-      result: 'Окупність за 2 тижні',
-    },
-  ];
+  const avgRating =
+    reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      : '4.9';
 
   const figureEightPath = {
     x: [
@@ -440,7 +429,7 @@ export function MarketingCourseLanding() {
                       <Star key={i} className="w-3 h-3 fill-current" />
                     ))}
                   </div>
-                  <span className="text-gray-400">4.9/5 рейтинг</span>
+                  <span className="text-gray-400">{avgRating}/5 рейтинг</span>
                 </div>
               </div>
             </div>
@@ -655,17 +644,19 @@ export function MarketingCourseLanding() {
         >
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Що кажуть наші учні</h2>
-            <div className="flex items-center justify-center gap-1 mb-8">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
-              ))}
-              <span className="ml-2 font-bold text-xl">4.9/5</span>
-            </div>
+            {reviews.length > 0 && (
+              <div className="flex items-center justify-center gap-1 mb-8">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
+                ))}
+                <span className="ml-2 font-bold text-xl">{avgRating}/5</span>
+              </div>
+            )}
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
+            {reviews.map((t, i) => (
               <motion.div
-                key={i}
+                key={t.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
@@ -673,28 +664,38 @@ export function MarketingCourseLanding() {
                 className="bg-[#1a0d2e]/60 border border-white/5 p-8 rounded-3xl relative"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] p-0.5 overflow-hidden relative">
-                    <Image
-                      src={`https://i.pravatar.cc/150?u=${t.name}`}
-                      alt={`Фото ${t.name}`}
-                      fill
-                      sizes="56px"
-                      className="rounded-full object-cover"
-                    />
-                  </div>
+                  {t.author_photo_url && (t.author_photo_url.startsWith('/') || t.author_photo_url.startsWith('http')) ? (
+                    <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] p-0.5 overflow-hidden relative">
+                      <Image
+                        src={t.author_photo_url}
+                        alt={`Фото ${t.author_name}`}
+                        fill
+                        sizes="56px"
+                        className="rounded-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] bg-gradient-to-br from-[#d946ef] to-[#fb7185] flex items-center justify-center text-white font-bold text-lg">
+                      {t.author_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div>
-                    <h4 className="font-bold text-lg">{t.name}</h4>
-                    <p className="text-sm text-gray-500">{t.business}</p>
+                    <h4 className="font-bold text-lg">{t.author_name}</h4>
+                    {t.business && (
+                      <p className="text-sm text-gray-500">{t.business}</p>
+                    )}
                   </div>
                 </div>
                 <div className="mb-4 text-gray-300 leading-relaxed italic">
                   &ldquo;{t.text}&rdquo;
                 </div>
-                <div className="pt-4 border-t border-white/5">
-                  <div className="text-[#fb7185] font-bold text-sm uppercase">
-                    {t.result}
+                {t.result && (
+                  <div className="pt-4 border-t border-white/5">
+                    <div className="text-[#fb7185] font-bold text-sm uppercase">
+                      {t.result}
+                    </div>
                   </div>
-                </div>
+                )}
               </motion.div>
             ))}
           </div>

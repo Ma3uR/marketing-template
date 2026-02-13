@@ -6,13 +6,14 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
-import { LayoutDashboard, ShoppingBag, Mail, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Mail, Star, LogOut, Menu, X } from 'lucide-react';
 import GlassCard from './GlassCard';
 
 const NAV_ITEMS = [
   { id: '/admin', label: 'Дашборд', icon: LayoutDashboard },
   { id: '/admin/orders', label: 'Замовлення', icon: ShoppingBag },
   { id: '/admin/emails', label: 'Шаблони листів', icon: Mail },
+  { id: '/admin/reviews', label: 'Відгуки', icon: Star },
 ] as const;
 
 interface AdminNavbarProps {
