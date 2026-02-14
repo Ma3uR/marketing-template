@@ -115,7 +115,6 @@ export default async function AdminDashboard() {
         </GlassCard>
 
         <GlassCard className="lg:col-span-1">
-          <h3 className="text-xl font-bold text-white mb-6">Джерела трафіку</h3>
           <TrafficSources />
         </GlassCard>
       </div>
