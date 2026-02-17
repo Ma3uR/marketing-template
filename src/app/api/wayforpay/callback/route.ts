@@ -9,15 +9,16 @@ import { sendPurchaseConfirmationEmail } from '@/lib/send-email';
 import type { WayForPayCallback } from '@/types/wayforpay';
 import type { OrderInsert } from '@/types/database';
 
-function extractProductName(orderReference: string): string {
-  const tierMap: Record<string, string> = {
-    basic: 'Курс Базовий',
-    premium: 'Курс Преміум',
-    vip: 'Курс VIP',
-  };
+async function extractProductName(orderReference: string): Promise<string> {
+  const slug = orderReference.split('_')[0];
+  const supabase = await createServiceClient();
+  const { data } = await supabase
+    .from('pricing_tiers')
+    .select('title')
+    .eq('slug', slug)
+    .single<{ title: string }>();
 
-  const tier = orderReference.split('_')[0];
-  return tierMap[tier] || 'Курс';
+  return data ? `Курс "${data.title}"` : 'Курс';
 }
 
 async function saveOrder(callback: WayForPayCallback) {
@@ -30,7 +31,7 @@ async function saveOrder(callback: WayForPayCallback) {
     status: callback.transactionStatus,
     customer_email: callback.email || null,
     customer_phone: callback.phone || null,
-    product_name: extractProductName(callback.orderReference),
+    product_name: await extractProductName(callback.orderReference),
     card_pan: callback.cardPan || null,
     card_type: callback.cardType || null,
     payment_system: callback.paymentSystem || null,
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
             await sendPurchaseConfirmationEmail({
               to: callback.email,
               customerName: callback.email.split('@')[0],
-              productName: extractProductName(callback.orderReference),
+              productName: await extractProductName(callback.orderReference),
               amount: callback.amount,
               currency: callback.currency || 'UAH',
               orderReference: callback.orderReference,

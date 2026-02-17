@@ -1,20 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
-import { LayoutDashboard, ShoppingBag, Mail, Star, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Mail, Star, CreditCard, Settings, LogOut, Menu, X, MoreHorizontal } from 'lucide-react';
 import GlassCard from './GlassCard';
 
-const NAV_ITEMS = [
+const PRIMARY_NAV_ITEMS = [
   { id: '/admin', label: 'Дашборд', icon: LayoutDashboard },
   { id: '/admin/orders', label: 'Замовлення', icon: ShoppingBag },
-  { id: '/admin/emails', label: 'Шаблони листів', icon: Mail },
   { id: '/admin/reviews', label: 'Відгуки', icon: Star },
 ] as const;
+
+const SECONDARY_NAV_ITEMS = [
+  { id: '/admin/emails', label: 'Шаблони листів', icon: Mail },
+  { id: '/admin/pricing', label: 'Тарифи', icon: CreditCard },
+  { id: '/admin/settings', label: 'Налаштування', icon: Settings },
+] as const;
+
+const ALL_NAV_ITEMS = [...PRIMARY_NAV_ITEMS, ...SECONDARY_NAV_ITEMS];
 
 interface AdminNavbarProps {
   userEmail: string;
@@ -24,17 +31,38 @@ export default function AdminNavbar({ userEmail }: AdminNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+
+  const isActive = (href: string) => {
+    if (href === '/admin') return pathname === '/admin';
+    return pathname.startsWith(href);
+  };
+
+  const isSecondaryActive = SECONDARY_NAV_ITEMS.some((item) => isActive(item.id));
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target as Node)) {
+        setIsMoreOpen(false);
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMoreOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/admin/login');
     router.refresh();
-  };
-
-  const isActive = (href: string) => {
-    if (href === '/admin') return pathname === '/admin';
-    return pathname.startsWith(href);
   };
 
   return (
@@ -52,17 +80,17 @@ export default function AdminNavbar({ userEmail }: AdminNavbarProps) {
             </Link>
 
             <div className="hidden md:flex items-center gap-1 bg-black/20 p-1.5 rounded-2xl border border-white/5">
-              {NAV_ITEMS.map((tab) => (
+              {PRIMARY_NAV_ITEMS.map((tab) => (
                 <Link
                   key={tab.id}
                   href={tab.id}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 relative ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 relative ${
                     isActive(tab.id) ? 'text-white' : 'text-gray-500 hover:text-gray-300'
                   }`}
                 >
                   {isActive(tab.id) && (
                     <motion.div
-                      layoutId="activeTab"
+                      layoutId="activeNavTab"
                       className="absolute inset-0 bg-white/5 rounded-xl border border-white/10 shadow-inner"
                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                     />
@@ -73,6 +101,55 @@ export default function AdminNavbar({ userEmail }: AdminNavbarProps) {
                   </span>
                 </Link>
               ))}
+
+              <div className="relative" ref={moreDropdownRef}>
+                <button
+                  onClick={() => setIsMoreOpen(!isMoreOpen)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 relative ${
+                    isSecondaryActive ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {isSecondaryActive && (
+                    <motion.div
+                      layoutId="activeMoreTab"
+                      className="absolute inset-0 bg-white/5 rounded-xl border border-white/10 shadow-inner"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <MoreHorizontal className="w-4 h-4" />
+                    Ще
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {isMoreOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full right-0 mt-2 w-56 bg-[rgba(26,13,46,0.95)] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                    >
+                      {SECONDARY_NAV_ITEMS.map((item) => (
+                        <Link
+                          key={item.id}
+                          href={item.id}
+                          onClick={() => setIsMoreOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-3 text-sm font-bold transition-all ${
+                            isActive(item.id)
+                              ? 'text-rose-400 bg-rose-500/10'
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -117,7 +194,7 @@ export default function AdminNavbar({ userEmail }: AdminNavbarProps) {
             className="fixed inset-x-4 lg:inset-x-6 top-24 z-40 md:hidden"
           >
             <GlassCard className="p-4 space-y-2">
-              {NAV_ITEMS.map((tab) => (
+              {ALL_NAV_ITEMS.map((tab) => (
                 <Link
                   key={tab.id}
                   href={tab.id}

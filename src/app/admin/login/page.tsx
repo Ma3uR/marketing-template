@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (pasted.length > 0) {
-      const newOtp = [...otp];
+      const newOtp = ['', '', '', '', '', ''];
       for (let i = 0; i < pasted.length; i++) {
         newOtp[i] = pasted[i];
       }

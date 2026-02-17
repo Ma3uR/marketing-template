@@ -27,9 +27,12 @@ async function getOrders(searchParams: SearchParams) {
   }
 
   if (search) {
-    query = query.or(
-      `customer_email.ilike.%${search}%,customer_name.ilike.%${search}%,order_reference.ilike.%${search}%`
-    );
+    const sanitized = search.replace(/[%_,().*]/g, '');
+    if (sanitized) {
+      query = query.or(
+        `customer_email.ilike.%${sanitized}%,customer_name.ilike.%${sanitized}%,order_reference.ilike.%${sanitized}%`
+      );
+    }
   }
 
   const { data, count, error } = await query

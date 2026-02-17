@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Save, Loader2, Trash2, Star, Eye, EyeOff } from 'lucide-react';
-import type { Review } from '@/types/database';
+import type { Review, ReviewInsert, ReviewUpdate } from '@/types/database';
 import GlassCard from './GlassCard';
 
 interface ReviewEditorProps {
@@ -39,7 +39,7 @@ export default function ReviewEditor({ review, isNew, onClose }: ReviewEditorPro
       const photoUrl = formData.author_photo_url.trim();
       const isValidPhotoUrl = photoUrl.startsWith('/') || photoUrl.startsWith('http');
 
-      const payload = {
+      const payload: ReviewInsert = {
         author_name: formData.author_name,
         author_photo_url: isValidPhotoUrl ? photoUrl : null,
         rating: formData.rating,
@@ -57,9 +57,10 @@ export default function ReviewEditor({ review, isNew, onClose }: ReviewEditorPro
 
         if (insertError) throw insertError;
       } else {
+        const updatePayload: ReviewUpdate = { ...payload, updated_at: new Date().toISOString() };
         const { error: updateError } = await supabase
           .from('reviews')
-          .update({ ...payload, updated_at: new Date().toISOString() } as never)
+          .update(updatePayload as never)
           .eq('id', review.id);
 
         if (updateError) throw updateError;

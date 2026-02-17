@@ -69,13 +69,3 @@ export type TransactionType =
   | 'CREATE_INVOICE'
   | 'TRANSACTION_LIST';
 
-export type PricingTier = 'basic' | 'premium' | 'vip';
-
-export interface PricingConfig {
-  title: string;
-  price: number;
-  originalPrice: number;
-  features: string[];
-  isPopular: boolean;
-  urgency?: string;
-}

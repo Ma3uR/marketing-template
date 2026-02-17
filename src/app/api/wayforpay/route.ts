@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePurchaseSignature, getMerchantConfig } from '@/lib/wayforpay';
-import { PRICING } from '@/lib/pricing';
-import type { PricingTier } from '@/types/wayforpay';
+import { createServiceClient } from '@/lib/supabase/server';
+import type { PricingTier } from '@/types/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,16 +18,27 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { tier } = body as { tier: PricingTier };
+    const { tier: tierSlug } = body as { tier: string };
 
-    if (!tier || !PRICING[tier]) {
+    if (!tierSlug) {
       return NextResponse.json({ error: 'Invalid tier' }, { status: 400 });
     }
 
-    const config = PRICING[tier];
+    const supabase = await createServiceClient();
+    const { data: config, error: dbError } = await supabase
+      .from('pricing_tiers')
+      .select('*')
+      .eq('slug', tierSlug)
+      .eq('is_active', true)
+      .single<PricingTier>();
+
+    if (dbError || !config) {
+      return NextResponse.json({ error: 'Invalid tier' }, { status: 400 });
+    }
+
     const merchant = getMerchantConfig();
 
-    const orderReference = `${tier}_${Date.now()}`;
+    const orderReference = `${tierSlug}_${Date.now()}`;
     const orderDate = Math.floor(Date.now() / 1000);
     const currency = 'UAH';
 
