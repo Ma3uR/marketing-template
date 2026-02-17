@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { PricingTier } from '@/types/wayforpay';
 
 interface CheckoutButtonProps {
-  tier: PricingTier;
+  tier: string;
   label: string;
   isPopular?: boolean;
 }

@@ -1,21 +1,19 @@
-import type { WayForPayCallback, PricingTier } from '@/types/wayforpay';
+import type { WayForPayCallback } from '@/types/wayforpay';
+import { createServiceClient } from '@/lib/supabase/server';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-const TIER_NAMES: Record<PricingTier, string> = {
-  basic: 'Базовий',
-  premium: 'Преміум',
-  vip: 'VIP',
-};
+async function getTierFromOrderReference(orderReference: string): Promise<string> {
+  const slug = orderReference.split('_')[0];
+  const supabase = await createServiceClient();
+  const { data } = await supabase
+    .from('pricing_tiers')
+    .select('title')
+    .eq('slug', slug)
+    .single<{ title: string }>();
 
-function getTierFromOrderReference(orderReference: string): string {
-  const tierMatch = orderReference.match(/^(basic|premium|vip)_/i);
-  if (tierMatch) {
-    const tier = tierMatch[1].toLowerCase() as PricingTier;
-    return TIER_NAMES[tier] || tier;
-  }
-  return 'Невідомий';
+  return data?.title || slug;
 }
 
 export async function sendPaymentNotification(
@@ -27,7 +25,7 @@ export async function sendPaymentNotification(
   }
 
   const statusEmoji = callback.transactionStatus === 'Approved' ? '✅' : '❌';
-  const tierName = getTierFromOrderReference(callback.orderReference);
+  const tierName = await getTierFromOrderReference(callback.orderReference);
 
   const message = `
 💰 Нова оплата!

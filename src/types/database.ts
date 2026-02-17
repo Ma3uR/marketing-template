@@ -98,6 +98,52 @@ export interface ReviewUpdate {
   updated_at?: string;
 }
 
+export interface PricingTier {
+  id: string;
+  slug: string;
+  title: string;
+  price: number;
+  original_price: number;
+  features: string[];
+  is_popular: boolean;
+  urgency: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PricingTierInsert {
+  slug: string;
+  title: string;
+  price: number;
+  original_price: number;
+  features?: string[];
+  is_popular?: boolean;
+  urgency?: string | null;
+  is_active?: boolean;
+  sort_order?: number;
+}
+
+export interface PricingTierUpdate {
+  slug?: string;
+  title?: string;
+  price?: number;
+  original_price?: number;
+  features?: string[];
+  is_popular?: boolean;
+  urgency?: string | null;
+  is_active?: boolean;
+  sort_order?: number;
+  updated_at?: string;
+}
+
+export interface SiteSetting {
+  key: string;
+  value: string;
+  updated_at: string;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -126,6 +172,16 @@ export type Database = {
         Row: AdminUser;
         Insert: { email: string };
         Update: { email?: string };
+      };
+      site_settings: {
+        Row: SiteSetting;
+        Insert: { key: string; value: string };
+        Update: { value?: string; updated_at?: string };
+      };
+      pricing_tiers: {
+        Row: PricingTier;
+        Insert: PricingTierInsert;
+        Update: PricingTierUpdate;
       };
     };
     Views: Record<string, never>;

@@ -73,8 +73,6 @@ export async function middleware(request: NextRequest) {
       .eq('email', user.email)
       .single();
 
-      console.log('adminUser', adminUser);
-
     if (!adminUser) {
       // User is authenticated but not an admin
       const url = request.nextUrl.clone();

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { replaceTemplateVariables } from '@/lib/email-templates';
 import { Save, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
-import type { EmailTemplate } from '@/types/database';
+import type { EmailTemplate, EmailTemplateInsert, EmailTemplateUpdate } from '@/types/database';
 import GlassCard from './GlassCard';
 
 interface EmailEditorProps {
@@ -47,31 +47,33 @@ export default function EmailEditor({ template, isNew }: EmailEditorProps) {
 
     try {
       if (isNew) {
+        const insertPayload: EmailTemplateInsert = {
+          slug: formData.slug,
+          name: formData.name,
+          subject: formData.subject,
+          body_html: formData.body_html,
+          variables: formData.variables,
+          is_active: formData.is_active,
+        };
         const { error: insertError } = await supabase
           .from('email_templates')
-          .insert({
-            slug: formData.slug,
-            name: formData.name,
-            subject: formData.subject,
-            body_html: formData.body_html,
-            variables: formData.variables,
-            is_active: formData.is_active,
-          } as never);
+          .insert(insertPayload as never);
 
         if (insertError) throw insertError;
         setSuccess('Шаблон створено!');
         router.push(`/admin/emails/${formData.slug}`);
       } else {
+        const updatePayload: EmailTemplateUpdate = {
+          name: formData.name,
+          subject: formData.subject,
+          body_html: formData.body_html,
+          variables: formData.variables,
+          is_active: formData.is_active,
+          updated_at: new Date().toISOString(),
+        };
         const { error: updateError } = await supabase
           .from('email_templates')
-          .update({
-            name: formData.name,
-            subject: formData.subject,
-            body_html: formData.body_html,
-            variables: formData.variables,
-            is_active: formData.is_active,
-            updated_at: new Date().toISOString(),
-          } as never)
+          .update(updatePayload as never)
           .eq('slug', template.slug);
 
         if (updateError) throw updateError;

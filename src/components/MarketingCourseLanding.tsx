@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import {
   CheckCircle2,
@@ -22,8 +22,10 @@ import {
   X,
 } from 'lucide-react';
 import { PricingCard } from './PricingCard';
-import type { PricingTier } from '@/types/wayforpay';
-import type { Review } from '@/types/database';
+import { BackgroundEffects } from './BackgroundEffects';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import type { Review, PricingTier } from '@/types/database';
 
 const NavLink = ({
   href,
@@ -69,29 +71,25 @@ const BenefitCard = ({
   </motion.div>
 );
 
-interface PricingData {
-  tier: PricingTier;
-  title: string;
-  price: number;
-  originalPrice: number;
-  features: string[];
-  isPopular: boolean;
-  urgency?: string;
-}
-
 interface MarketingCourseLandingProps {
   reviews: Review[];
+  heroImageUrl?: string;
+  pricingTiers: PricingTier[];
 }
 
-export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps) {
+export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: MarketingCourseLandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const isMobile = useIsMobile();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const shouldAnimate = !isMobile && !prefersReducedMotion;
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 20;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -134,89 +132,10 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
     },
   ];
 
-  const pricing: PricingData[] = [
-    {
-      tier: 'basic',
-      title: 'Базовий',
-      price: 799,
-      originalPrice: 1200,
-      features: [
-        'Доступ до 12 модулів',
-        'Шаблони стратегій',
-        'Доступ до чату учнів',
-        'Сертифікат про завершення',
-      ],
-      isPopular: false,
-    },
-    {
-      tier: 'premium',
-      title: 'Преміум',
-      price: 7999,
-      originalPrice: 12800,
-      features: [
-        'Все з Базового',
-        '2 групові сесії зі мною',
-        'Перевірка ДЗ кураторами',
-        'Закритий чат з фахівцями',
-        'Бонус: гайд по креативах',
-        'Доступ на 12 місяців',
-      ],
-      isPopular: true,
-    },
-    {
-      tier: 'vip',
-      title: 'VIP',
-      price: 12999,
-      originalPrice: 19999,
-      features: [
-        'Все з Преміум',
-        'Особистий менторинг (3 зустрічі)',
-        'Аудит твоєї поточної реклами',
-        'Розробка стратегії під ключ',
-        'Пріоритетна підтримка 24/7',
-      ],
-      isPopular: false,
-      urgency: 'Залишилось 3 місця',
-    },
-  ];
-
   const avgRating =
     reviews.length > 0
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : '4.9';
-
-  const figureEightPath = {
-    x: [
-      '0%',
-      '15%',
-      '25%',
-      '30%',
-      '25%',
-      '15%',
-      '0%',
-      '-15%',
-      '-25%',
-      '-30%',
-      '-25%',
-      '-15%',
-      '0%',
-    ],
-    y: [
-      '0%',
-      '-20%',
-      '-35%',
-      '-40%',
-      '-35%',
-      '-20%',
-      '0%',
-      '20%',
-      '35%',
-      '40%',
-      '35%',
-      '20%',
-      '0%',
-    ],
-  };
 
   const sectionVariants = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -251,50 +170,7 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
 
   return (
     <div className="min-h-screen bg-[#0f0a1f] text-white selection:bg-[#fb7185] selection:text-white overflow-x-hidden relative">
-      {/* Animated Geometric Grid Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(168, 85, 247, 0.08) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(168, 85, 247, 0.08) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-          }}
-        />
-
-        <motion.div
-          className="absolute inset-0"
-          animate={figureEightPath}
-          transition={{
-            duration: 40,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          style={{
-            background: `radial-gradient(
-              circle 800px at 50% 50%,
-              rgba(217, 70, 239, 0.15),
-              rgba(168, 85, 247, 0.1) 30%,
-              rgba(251, 113, 133, 0.08) 50%,
-              transparent 70%
-            )`,
-          }}
-        />
-      </div>
-
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <motion.div
-          style={{ y: backgroundY }}
-          className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-[#3b1d8f]/20 blur-[120px] rounded-full"
-        />
-        <motion.div
-          style={{ y: backgroundY }}
-          className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-[#d946ef]/10 blur-[120px] rounded-full"
-        />
-      </div>
+      <BackgroundEffects shouldAnimate={shouldAnimate} />
 
       {/* Header */}
       <header
@@ -443,7 +319,7 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
           >
             <div className="relative z-10 rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] max-h-[600px]">
               <Image
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1288&auto=format&fit=crop"
+                src={heroImageUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1288&auto=format&fit=crop'}
                 alt="Маркетинг коуч"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -453,8 +329,8 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
             </div>
             {/* Floating UI Elements */}
             <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              animate={shouldAnimate ? { y: [0, -10, 0] } : undefined}
+              transition={shouldAnimate ? { duration: 4, repeat: Infinity, ease: 'easeInOut' } : undefined}
               className="absolute -top-4 -right-2 sm:-top-6 sm:-right-6 bg-[#1a0d2e]/90 border border-white/10 p-3 sm:p-4 rounded-2xl backdrop-blur-md shadow-xl z-20"
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -474,13 +350,8 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
             </motion.div>
 
             <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: 1,
-              }}
+              animate={shouldAnimate ? { y: [0, 10, 0] } : undefined}
+              transition={shouldAnimate ? { duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 } : undefined}
               className="absolute bottom-8 -left-2 sm:bottom-12 sm:-left-12 bg-[#1a0d2e]/90 border border-white/10 p-3 sm:p-4 rounded-2xl backdrop-blur-md shadow-xl z-20 flex items-center gap-3 sm:gap-4"
             >
               <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#d946ef]" />
@@ -607,7 +478,7 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
         </motion.section>
 
         {/* Pricing Section */}
-        <motion.section
+        {pricingTiers.length > 0 && <motion.section
           id="pricing"
           initial="hidden"
           whileInView="visible"
@@ -626,12 +497,22 @@ export function MarketingCourseLanding({ reviews }: MarketingCourseLandingProps)
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-6xl mx-auto">
-              {pricing.map((tier, i) => (
-                <PricingCard key={tier.tier} {...tier} delay={i * 0.15} />
+              {pricingTiers.map((tier, i) => (
+                <PricingCard
+                  key={tier.slug}
+                  tier={tier.slug}
+                  title={tier.title}
+                  price={tier.price}
+                  originalPrice={tier.original_price}
+                  features={tier.features}
+                  isPopular={tier.is_popular}
+                  urgency={tier.urgency ?? undefined}
+                  delay={i * 0.15}
+                />
               ))}
             </div>
           </div>
-        </motion.section>
+        </motion.section>}
 
         {/* Testimonials */}
         <motion.section

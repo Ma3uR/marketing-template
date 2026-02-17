@@ -3,10 +3,9 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { CheckoutButton } from './CheckoutButton';
-import type { PricingTier } from '@/types/wayforpay';
 
 interface PricingCardProps {
-  tier: PricingTier;
+  tier: string;
   title: string;
   price: number;
   originalPrice: number;
