@@ -26,6 +26,7 @@ import { BackgroundEffects } from './BackgroundEffects';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import type { Review, PricingTier } from '@/types/database';
+import type { SiteContent } from '@/types/content';
 
 const NavLink = ({
   href,
@@ -45,7 +46,7 @@ const NavLink = ({
   </a>
 );
 
-const BenefitCard = ({
+const BenefitCardComponent = ({
   icon: Icon,
   title,
   description,
@@ -71,13 +72,16 @@ const BenefitCard = ({
   </motion.div>
 );
 
+const BENEFIT_ICONS = [Rocket, Target, Wallet, Cpu, Headphones, Zap];
+
 interface MarketingCourseLandingProps {
   reviews: Review[];
   heroImageUrl?: string;
   pricingTiers: PricingTier[];
+  content: SiteContent;
 }
 
-export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: MarketingCourseLandingProps) {
+export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers, content }: MarketingCourseLandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -93,44 +97,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const benefits = [
-    {
-      icon: Rocket,
-      title: 'Запускай рекламу сам',
-      description:
-        'Ти перестанеш залежати від підрядників та навчишся контролювати кожен клік.',
-    },
-    {
-      icon: Target,
-      title: 'Цільова аудиторія',
-      description:
-        'Навчимо знаходити саме тих людей, які готові купувати твій продукт тут і зараз.',
-    },
-    {
-      icon: Wallet,
-      title: 'Контроль бюджету',
-      description:
-        'Дізнайся, як не зливати гроші на неефективні оголошення та масштабувати успішні.',
-    },
-    {
-      icon: Cpu,
-      title: 'Алгоритми Facebook',
-      description:
-        'Зрозумієш внутрішню логіку соцмереж, щоб алгоритми працювали на тебе, а не навпаки.',
-    },
-    {
-      icon: Headphones,
-      title: '2 місяці підтримки',
-      description:
-        'Ти не залишишся сам на сам з питаннями — ми допоможемо на кожному етапі запуску.',
-    },
-    {
-      icon: Zap,
-      title: 'Практичні навички',
-      description:
-        'Мінімум теорії, максимум практики. Створиш свою першу рекламну кампанію вже на курсі.',
-    },
-  ];
+  const { header, hero, benefits, about, pricing, reviews: reviewsContent, cta, footer } = content;
 
   const avgRating =
     reviews.length > 0
@@ -183,20 +150,20 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
         <div className="container mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] rounded-lg flex items-center justify-center font-bold">
-              Т
+              {header.logoLetter}
             </div>
             <span className="text-xl font-bold tracking-tight">
-              Таня Сідоренко
+              {header.brandName}
             </span>
           </div>
 
           <nav className="hidden md:flex items-center gap-8" aria-label="Основна навігація">
-            <NavLink href="#benefits">Переваги</NavLink>
-            <NavLink href="#about">Про автора</NavLink>
-            <NavLink href="#pricing">Тарифи</NavLink>
-            <NavLink href="#reviews">Відгуки</NavLink>
+            <NavLink href="#benefits">{header.navBenefits}</NavLink>
+            <NavLink href="#about">{header.navAbout}</NavLink>
+            <NavLink href="#pricing">{header.navPricing}</NavLink>
+            <NavLink href="#reviews">{header.navReviews}</NavLink>
             <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-full text-sm font-semibold transition-all">
-              Увійти
+              {header.loginButton}
             </button>
           </nav>
 
@@ -224,22 +191,22 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
             aria-label="Навігаційне меню"
           >
             <NavLink href="#benefits" onClick={closeMobileMenu}>
-              Переваги
+              {header.navBenefits}
             </NavLink>
             <NavLink href="#about" onClick={closeMobileMenu}>
-              Про автора
+              {header.navAbout}
             </NavLink>
             <NavLink href="#pricing" onClick={closeMobileMenu}>
-              Тарифи
+              {header.navPricing}
             </NavLink>
             <NavLink href="#reviews" onClick={closeMobileMenu}>
-              Відгуки
+              {header.navReviews}
             </NavLink>
             <button
               onClick={scrollToPricing}
               className="px-8 py-3 bg-gradient-to-r from-[#d946ef] to-[#fb7185] rounded-full font-bold"
             >
-              Почати навчання
+              {header.mobileCtaButton}
             </button>
           </motion.div>
         )}
@@ -262,25 +229,24 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm font-medium mb-6">
               <Star className="w-4 h-4 fill-purple-300" />
-              <span>Вже навчились 500+ підприємців</span>
+              <span>{hero.badge}</span>
             </div>
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight mb-6 break-words">
-              Перестань{' '}
+              {hero.headingPrefix}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d946ef] to-[#fb7185]">
-                переплачувати
+                {hero.headingHighlight}
               </span>{' '}
-              за рекламу
+              {hero.headingSuffix}
             </h1>
             <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Стань власним таргетологом за 14 днів. Навчись запускати рекламу,
-              яка приносить реальні гроші, а не просто лайки.
+              {hero.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <button
                 onClick={scrollToPricing}
                 className="px-10 py-4 bg-gradient-to-r from-[#d946ef] to-[#fb7185] rounded-2xl font-bold text-lg hover:shadow-[0_0_40px_rgba(217,70,239,0.4)] transition-all hover:scale-[1.02] flex items-center gap-2"
               >
-                Почати навчання <ArrowRight className="w-5 h-5" />
+                {hero.ctaButton} <ArrowRight className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3 ml-0 sm:ml-4">
                 <div className="flex -space-x-2">
@@ -305,7 +271,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                       <Star key={i} className="w-3 h-3 fill-current" />
                     ))}
                   </div>
-                  <span className="text-gray-400">{avgRating}/5 рейтинг</span>
+                  <span className="text-gray-400">{avgRating}/5 {hero.ratingText}</span>
                 </div>
               </div>
             </div>
@@ -339,9 +305,9 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                 </div>
                 <div>
                   <div className="text-[8px] sm:text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                    ROI
+                    {hero.roiLabel}
                   </div>
-                  <div className="text-sm sm:text-lg font-bold text-white">+248%</div>
+                  <div className="text-sm sm:text-lg font-bold text-white">{hero.roiValue}</div>
                 </div>
               </div>
               <div className="h-1 sm:h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -356,8 +322,8 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
             >
               <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#d946ef]" />
               <div>
-                <div className="text-[10px] sm:text-xs text-gray-400">Нових лідів</div>
-                <div className="text-sm sm:text-base font-bold">+1,240</div>
+                <div className="text-[10px] sm:text-xs text-gray-400">{hero.leadsLabel}</div>
+                <div className="text-sm sm:text-base font-bold">{hero.leadsValue}</div>
               </div>
             </motion.div>
 
@@ -377,16 +343,21 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">
-                Що ти отримаєш на курсі
+                {benefits.heading}
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto">
-                Покрокова програма, розроблена спеціально для власників малого
-                та середнього бізнесу.
+                {benefits.subtitle}
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {benefits.map((benefit, i) => (
-                <BenefitCard key={i} {...benefit} delay={i * 0.1} />
+              {benefits.cards.map((card, i) => (
+                <BenefitCardComponent
+                  key={i}
+                  icon={BENEFIT_ICONS[i] || Zap}
+                  title={card.title}
+                  description={card.description}
+                  delay={i * 0.1}
+                />
               ))}
             </div>
           </div>
@@ -420,9 +391,9 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                 />
               </div>
               <div className="absolute -bottom-4 -right-2 sm:-bottom-6 sm:-right-6 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] p-4 sm:p-6 rounded-2xl z-20">
-                <div className="text-2xl sm:text-3xl font-bold">7 років</div>
+                <div className="text-2xl sm:text-3xl font-bold">{about.experienceYears}</div>
                 <div className="text-[10px] sm:text-xs uppercase tracking-widest font-medium opacity-80">
-                  Досвіду в Digital
+                  {about.experienceLabel}
                 </div>
               </div>
             </motion.div>
@@ -435,43 +406,36 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
               className="lg:w-3/5"
             >
               <div className="text-[#fb7185] font-bold uppercase tracking-widest text-sm mb-4">
-                Про автора
+                {about.label}
               </div>
               <h2 className="text-4xl font-bold mb-6">
-                Ваша провідниця у світ прибуткової реклами
+                {about.heading}
               </h2>
               <div className="space-y-6 text-gray-400 text-lg mb-8">
-                <p>
-                  Привіт! Я Таня Сідоренко, експерт із digital-маркетингу, і за
-                  останні 7 років я допомогла сотням бізнесів перестати зливати
-                  бюджети.
-                </p>
+                <p>{about.bio}</p>
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-[#a855f7] w-5 h-5" />
-                    <span>200+ успішних рекламних кампаній</span>
+                    <CheckCircle2 className="text-[#a855f7] w-5 h-5 flex-shrink-0" />
+                    <span>{about.achievement1}</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-[#a855f7] w-5 h-5" />
-                    <span>Працювала з брендами в 15 різних нішах</span>
+                    <CheckCircle2 className="text-[#a855f7] w-5 h-5 flex-shrink-0" />
+                    <span>{about.achievement2}</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-[#a855f7] w-5 h-5" />
-                    <span>
-                      Створила систему, яка зрозуміла навіть новачкам
-                    </span>
+                    <CheckCircle2 className="text-[#a855f7] w-5 h-5 flex-shrink-0" />
+                    <span>{about.achievement3}</span>
                   </li>
                 </ul>
                 <p className="italic border-l-2 border-[#fb7185] pl-6 py-2">
-                  &ldquo;Моя місія — дати підприємцям свободу та контроль над
-                  власним маркетингом.&rdquo;
+                  &ldquo;{about.quote}&rdquo;
                 </p>
               </div>
               <button
                 onClick={scrollToPricing}
                 className="px-8 py-4 bg-gradient-to-r from-[#d946ef] to-[#fb7185] rounded-xl font-bold hover:scale-[1.02] transition-transform"
               >
-                Хочу навчатись у тебе
+                {about.ctaButton}
               </button>
             </motion.div>
           </div>
@@ -489,11 +453,10 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">
-                Обери свій формат навчання
+                {pricing.heading}
               </h2>
               <p className="text-gray-400 max-w-xl mx-auto">
-                Гнучкі тарифи для будь-якого етапу твого бізнесу — від старту до
-                масштабів.
+                {pricing.subtitle}
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch max-w-6xl mx-auto">
@@ -524,7 +487,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
           className="py-16 sm:py-24 lg:py-32 container mx-auto px-6"
         >
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Що кажуть наші учні</h2>
+            <h2 className="text-4xl font-bold mb-4">{reviewsContent.heading}</h2>
             {reviews.length > 0 && (
               <div className="flex items-center justify-center gap-1 mb-8">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -601,25 +564,24 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
               <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
               <div className="relative z-10">
                 <h2 className="text-4xl lg:text-6xl font-bold mb-8 max-w-4xl mx-auto leading-tight">
-                  Готові створити потік клієнтів у свій бізнес?
+                  {cta.heading}
                 </h2>
                 <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-                  Реєструйтеся сьогодні та отримайте бонусний модуль
-                  &ldquo;Секрети High-Click креативів&rdquo; безкоштовно.
+                  {cta.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                   <button
                     onClick={scrollToPricing}
                     className="px-12 py-5 bg-[#ffffff] text-[#0f0a1f] rounded-2xl font-bold text-xl hover:bg-gray-100 hover:scale-105 transition-all"
                   >
-                    Почати зараз
+                    {cta.ctaButton}
                   </button>
                   <div className="text-left">
                     <div className="text-sm font-semibold text-gray-400">
-                      Гарантія повернення коштів
+                      {cta.guaranteeLabel}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-green-400 font-bold">
-                      <ShieldCheck className="w-4 h-4" /> 100% Безпека
+                      <ShieldCheck className="w-4 h-4" /> {cta.guaranteeBadge}
                     </div>
                   </div>
                 </div>
@@ -642,20 +604,19 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-gradient-to-tr from-[#d946ef] to-[#fb7185] rounded-lg flex items-center justify-center font-bold">
-                  Т
+                  {header.logoLetter}
                 </div>
                 <span className="text-xl font-bold tracking-tight">
-                  Таня Сідоренко
+                  {footer.brandName}
                 </span>
               </div>
               <p className="text-gray-500 max-w-xs leading-relaxed">
-                Навчаємо підприємців будувати системний маркетинг без зайвих
-                витрат на агентства.
+                {footer.description}
               </p>
             </div>
             <div>
               <h5 className="font-bold mb-6 uppercase text-xs tracking-widest text-gray-400">
-                Навігація
+                {footer.navHeading}
               </h5>
               <ul className="space-y-4">
                 <li>
@@ -663,7 +624,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                     href="#benefits"
                     className="text-gray-500 hover:text-white transition-colors"
                   >
-                    Переваги
+                    {footer.navLink1}
                   </a>
                 </li>
                 <li>
@@ -671,7 +632,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                     href="#pricing"
                     className="text-gray-500 hover:text-white transition-colors"
                   >
-                    Тарифи
+                    {footer.navLink2}
                   </a>
                 </li>
                 <li>
@@ -679,7 +640,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                     href="#about"
                     className="text-gray-500 hover:text-white transition-colors"
                   >
-                    Про нас
+                    {footer.navLink3}
                   </a>
                 </li>
                 <li>
@@ -687,36 +648,36 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers }: 
                     href="#reviews"
                     className="text-gray-500 hover:text-white transition-colors"
                   >
-                    Контакти
+                    {footer.navLink4}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
               <h5 className="font-bold mb-6 uppercase text-xs tracking-widest text-gray-400">
-                Контакти
+                {footer.contactsHeading}
               </h5>
               <ul className="space-y-4 text-gray-500">
                 <li className="flex items-center gap-3">
-                  <Bell className="w-4 h-4" /> tanya@svidorenko.ua
+                  <Bell className="w-4 h-4" /> {footer.email}
                 </li>
                 <li className="flex items-center gap-3">
-                  <Instagram className="w-4 h-4" /> @tanya_svidorenko
+                  <Instagram className="w-4 h-4" /> {footer.instagram}
                 </li>
                 <li className="flex items-center gap-3">
-                  <Facebook className="w-4 h-4" /> fb.com/tanya.svidorenko
+                  <Facebook className="w-4 h-4" /> {footer.facebook}
                 </li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-600 text-sm">
-            <div>&copy; 2026 Таня Сідоренко. Всі права захищені.</div>
+            <div>&copy; {footer.copyright}</div>
             <nav className="flex items-center gap-8" aria-label="Правова інформація">
               <a href="/privacy" className="hover:text-gray-400">
-                Політика конфіденційності
+                {footer.privacyLink}
               </a>
               <a href="/terms" className="hover:text-gray-400">
-                Договір оферти
+                {footer.offerLink}
               </a>
             </nav>
           </div>

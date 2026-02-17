@@ -180,18 +180,18 @@ interface SeoContent {
 
 ## Acceptance Criteria
 
-- [ ] All ~63 text strings on the landing page are editable from `/admin/settings`
-- [ ] SEO metadata (title, description, keywords, OG tags) is editable
-- [ ] Content editor is organized by tabs: Header, Hero, Benefits, About, Pricing, Reviews, CTA, Footer, SEO
-- [ ] Each tab has its own Save button and a "Restore defaults" button
-- [ ] Landing page renders correctly with zero content rows in database (all defaults)
-- [ ] Landing page renders correctly with partial content (per-field fallback)
-- [ ] Invalid JSON in database does not crash the landing page (graceful fallback)
-- [ ] Admin form fields have character limit validation
-- [ ] Hero heading supports 3 separate fields (prefix, highlighted, suffix)
-- [ ] Benefits section edits 6 fixed cards (title + description each)
-- [ ] Mobile admin UI is usable for the content editor
-- [ ] `generateMetadata` in `page.tsx` serves dynamic SEO tags from database
+- [x] All ~63 text strings on the landing page are editable from `/admin/settings`
+- [x] SEO metadata (title, description, keywords, OG tags) is editable
+- [x] Content editor is organized by tabs: Header, Hero, Benefits, About, Pricing, Reviews, CTA, Footer, SEO
+- [x] Each tab has its own Save button and a "Restore defaults" button
+- [x] Landing page renders correctly with zero content rows in database (all defaults)
+- [x] Landing page renders correctly with partial content (per-field fallback)
+- [x] Invalid JSON in database does not crash the landing page (graceful fallback)
+- [x] Admin form fields have character limit validation
+- [x] Hero heading supports 3 separate fields (prefix, highlighted, suffix)
+- [x] Benefits section edits 6 fixed cards (title + description each)
+- [x] Mobile admin UI is usable for the content editor
+- [x] `generateMetadata` in `page.tsx` serves dynamic SEO tags from database
 
 ## Implementation Plan
 

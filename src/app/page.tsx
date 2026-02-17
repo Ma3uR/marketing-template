@@ -1,11 +1,32 @@
+import type { Metadata } from 'next';
 import { MarketingCourseLanding } from '@/components/MarketingCourseLanding';
 import { createClient } from '@/lib/supabase/server';
+import { fetchSiteContent, fetchSeoContent } from '@/lib/content';
 import type { Review, SiteSetting, PricingTier } from '@/types/database';
+
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const supabase = await createClient();
+  const seo = await fetchSeoContent(supabase);
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords.split(',').map((k) => k.trim()).filter(Boolean),
+    openGraph: {
+      title: seo.ogTitle,
+      description: seo.ogDescription,
+      locale: 'uk_UA',
+      type: 'website',
+    },
+  };
+}
 
 export default async function Home() {
   const supabase = await createClient();
 
-  const [{ data }, { data: heroSetting }, { data: pricingData }] = await Promise.all([
+  const [{ data }, { data: heroSetting }, { data: pricingData }, content] = await Promise.all([
     supabase
       .from('reviews')
       .select('*')
@@ -22,6 +43,7 @@ export default async function Home() {
       .select('*')
       .eq('is_active', true)
       .order('sort_order'),
+    fetchSiteContent(supabase),
   ]);
 
   return (
@@ -29,6 +51,7 @@ export default async function Home() {
       reviews={(data as Review[]) || []}
       heroImageUrl={heroSetting?.value || undefined}
       pricingTiers={(pricingData as PricingTier[]) || []}
+      content={content}
     />
   );
 }
