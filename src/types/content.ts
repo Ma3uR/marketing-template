@@ -35,6 +35,7 @@ export interface BenefitsContent {
 }
 
 export interface AboutContent {
+  name: string;
   label: string;
   heading: string;
   bio: string;

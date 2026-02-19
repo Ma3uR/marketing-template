@@ -77,6 +77,7 @@ const FIELD_CONFIGS: Record<string, FieldConfig[]> = {
     { key: 'subtitle', label: 'Підзаголовок секції', type: 'textarea', maxLength: 500 },
   ],
   about: [
+    { key: 'name', label: "Ім'я автора", type: 'input', maxLength: 120 },
     { key: 'label', label: 'Мітка секції', type: 'input', maxLength: 40 },
     { key: 'heading', label: 'Заголовок', type: 'input', maxLength: 120 },
     { key: 'bio', label: 'Біографія', type: 'textarea', maxLength: 500 },
@@ -285,61 +286,62 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
   };
 
   return (
-    <GlassCard className="space-y-6">
-      <div>
-        <h3 className="text-lg font-bold text-white mb-1">Контент сторінки</h3>
-        <p className="text-sm text-gray-500">
-          Редагуйте текстовий контент лендінгу та SEO метадані.
-        </p>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-1.5">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => { setActiveTab(tab.id); setStatus('idle'); setError(''); }}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              activeTab === tab.id
-                ? 'bg-gradient-to-r from-rose-500 to-fuchsia-600 text-white'
-                : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
-          {error}
+    <GlassCard className="!p-8">
+      <div className="space-y-8">
+        <div>
+          <h3 className="text-lg font-bold text-white mb-2">Контент сторінки</h3>
+          <p className="text-sm text-gray-500">
+            Редагуйте текстовий контент лендінгу та SEO метадані.
+          </p>
         </div>
-      )}
 
-      {/* Fields */}
-      <div className="space-y-4">
-        {activeTab === 'benefits' ? (
-          <BenefitsEditor
-            data={content.benefits}
-            fields={FIELD_CONFIGS.benefits || []}
-            onUpdateField={updateField}
-            onUpdateCard={updateBenefitCard}
-          />
-        ) : (
-          (FIELD_CONFIGS[activeTab] || []).map((field) => (
-            <FieldInput
-              key={field.key}
-              field={field}
-              value={String(currentData[field.key] ?? '')}
-              onChange={(val) => updateField(field.key, val)}
-            />
-          ))
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => { setActiveTab(tab.id); setStatus('idle'); setError(''); }}
+              className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-rose-500 to-fuchsia-600 text-white'
+                  : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+            {error}
+          </div>
         )}
-      </div>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+        {/* Fields */}
+        <div className="space-y-5">
+          {activeTab === 'benefits' ? (
+            <BenefitsEditor
+              data={content.benefits}
+              fields={FIELD_CONFIGS.benefits || []}
+              onUpdateField={updateField}
+              onUpdateCard={updateBenefitCard}
+            />
+          ) : (
+            (FIELD_CONFIGS[activeTab] || []).map((field) => (
+              <FieldInput
+                key={field.key}
+                field={field}
+                value={String(currentData[field.key] ?? '')}
+                onChange={(val) => updateField(field.key, val)}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4 border-t border-white/5">
         <button
           onClick={handleSave}
           disabled={saving || resetting}
@@ -367,6 +369,7 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
           )}
           Відновити за замовчуванням
         </button>
+        </div>
       </div>
     </GlassCard>
   );

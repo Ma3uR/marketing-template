@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const supabase = await createClient();
 
-  const [{ data }, { data: heroSetting }, { data: pricingData }, content] = await Promise.all([
+  const [{ data }, { data: heroSetting }, { data: instructorSetting }, { data: pricingData }, content] = await Promise.all([
     supabase
       .from('reviews')
       .select('*')
@@ -37,6 +37,11 @@ export default async function Home() {
       .from('site_settings')
       .select('value')
       .eq('key', 'hero_image_url')
+      .single<Pick<SiteSetting, 'value'>>(),
+    supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'instructor_image_url')
       .single<Pick<SiteSetting, 'value'>>(),
     supabase
       .from('pricing_tiers')
@@ -50,6 +55,7 @@ export default async function Home() {
     <MarketingCourseLanding
       reviews={(data as Review[]) || []}
       heroImageUrl={heroSetting?.value || undefined}
+      instructorImageUrl={instructorSetting?.value || undefined}
       pricingTiers={(pricingData as PricingTier[]) || []}
       content={content}
     />

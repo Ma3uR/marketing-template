@@ -76,6 +76,7 @@ export const defaultBenefits: BenefitsContent = {
 };
 
 export const defaultAbout: AboutContent = {
+  name: 'Таня Сідоренко',
   label: 'Про автора',
   heading: 'Ваша провідниця у світ прибуткової реклами',
   bio: 'Привіт! Я Таня Сідоренко, експерт із digital-маркетингу, і за останні 7 років я допомогла сотням бізнесів перестати зливати бюджети.',

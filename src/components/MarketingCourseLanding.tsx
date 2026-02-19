@@ -77,11 +77,12 @@ const BENEFIT_ICONS = [Rocket, Target, Wallet, Cpu, Headphones, Zap];
 interface MarketingCourseLandingProps {
   reviews: Review[];
   heroImageUrl?: string;
+  instructorImageUrl?: string;
   pricingTiers: PricingTier[];
   content: SiteContent;
 }
 
-export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers, content }: MarketingCourseLandingProps) {
+export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageUrl, pricingTiers, content }: MarketingCourseLandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -383,8 +384,8 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, pricingTiers, co
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#d946ef]/20 rounded-full blur-3xl" />
               <div className="relative rounded-3xl overflow-hidden aspect-[4/5] border border-white/10 z-10">
                 <Image
-                  src="https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?q=80&w=1280&auto=format&fit=crop"
-                  alt="Таня Сідоренко - інструктор курсу"
+                  src={instructorImageUrl || "https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?q=80&w=1280&auto=format&fit=crop"}
+                  alt={`${about.name} - інструктор курсу`}
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover grayscale-[0.2]"
