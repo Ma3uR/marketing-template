@@ -7,15 +7,27 @@ import { createClient } from '@/lib/supabase/client';
 import { Upload, Loader2, ImageIcon, Trash2 } from 'lucide-react';
 import GlassCard from './GlassCard';
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1288&auto=format&fit=crop';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-interface HeroImageUploaderProps {
+interface ImageUploaderProps {
   currentImageUrl: string | null;
+  fallbackImage: string;
+  storagePath: string;
+  settingsKey: string;
+  title: string;
+  description: string;
+  bucket?: string;
 }
 
-export default function HeroImageUploader({ currentImageUrl }: HeroImageUploaderProps) {
+export default function ImageUploader({
+  currentImageUrl,
+  fallbackImage,
+  storagePath,
+  settingsKey,
+  title,
+  description,
+  bucket = 'hero-images',
+}: ImageUploaderProps) {
   const router = useRouter();
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +36,7 @@ export default function HeroImageUploader({ currentImageUrl }: HeroImageUploader
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
-  const displayUrl = currentImageUrl || FALLBACK_IMAGE;
+  const displayUrl = currentImageUrl || fallbackImage;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,20 +57,20 @@ export default function HeroImageUploader({ currentImageUrl }: HeroImageUploader
 
     try {
       const { error: uploadError } = await supabase.storage
-        .from('hero-images')
-        .upload('hero.webp', file, { upsert: true, contentType: file.type });
+        .from(bucket)
+        .upload(storagePath, file, { upsert: true, contentType: file.type });
 
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage
-        .from('hero-images')
-        .getPublicUrl('hero.webp');
+        .from(bucket)
+        .getPublicUrl(storagePath);
 
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
       const { error: upsertError } = await supabase
         .from('site_settings')
-        .upsert({ key: 'hero_image_url', value: publicUrl } as never, { onConflict: 'key' });
+        .upsert({ key: settingsKey, value: publicUrl } as never, { onConflict: 'key' });
 
       if (upsertError) throw upsertError;
 
@@ -78,12 +90,12 @@ export default function HeroImageUploader({ currentImageUrl }: HeroImageUploader
     setError('');
 
     try {
-      await supabase.storage.from('hero-images').remove(['hero.webp']);
+      await supabase.storage.from(bucket).remove([storagePath]);
 
       const { error: deleteError } = await supabase
         .from('site_settings')
         .delete()
-        .eq('key', 'hero_image_url');
+        .eq('key', settingsKey);
 
       if (deleteError) throw deleteError;
 
@@ -98,10 +110,8 @@ export default function HeroImageUploader({ currentImageUrl }: HeroImageUploader
   return (
     <GlassCard className="space-y-6">
       <div>
-        <h3 className="text-lg font-bold text-white mb-1">Фото героя (Hero Section)</h3>
-        <p className="text-sm text-gray-500">
-          Зображення відображається у верхній секції лендінгу. Максимум 5MB.
-        </p>
+        <h3 className="text-lg font-bold text-white mb-1">{title}</h3>
+        <p className="text-sm text-gray-500">{description}</p>
       </div>
 
       {error && (
@@ -110,11 +120,11 @@ export default function HeroImageUploader({ currentImageUrl }: HeroImageUploader
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-6 items-start">
-        <div className="relative w-full sm:w-64 aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex-shrink-0">
+      <div className="flex flex-col gap-4">
+        <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden border border-white/10 bg-white/5">
           <Image
             src={displayUrl}
-            alt="Hero preview"
+            alt="Preview"
             fill
             className="object-cover"
             sizes="256px"
