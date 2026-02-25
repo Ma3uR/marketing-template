@@ -20,11 +20,19 @@ import {
   Rocket,
   Menu,
   X,
+  Briefcase,
+  Laptop,
+  Megaphone,
+  GraduationCap,
+  Crown,
+  Clock,
 } from 'lucide-react';
 import { PricingCard } from './PricingCard';
 import { BackgroundEffects } from './BackgroundEffects';
+import { ReviewsCarousel } from './ReviewsCarousel';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { parseVideoEmbedUrl } from '@/lib/video';
 import type { Review, PricingTier } from '@/types/database';
 import type { SiteContent } from '@/types/content';
 
@@ -73,6 +81,8 @@ const BenefitCardComponent = ({
 );
 
 const BENEFIT_ICONS = [Rocket, Target, Wallet, Cpu, Headphones, Zap];
+const PERSONA_ICONS = [Briefcase, Laptop, Megaphone, GraduationCap];
+const USP_ICONS = [Clock, ShieldCheck, Crown];
 
 interface MarketingCourseLandingProps {
   reviews: Review[];
@@ -80,9 +90,10 @@ interface MarketingCourseLandingProps {
   instructorImageUrl?: string;
   pricingTiers: PricingTier[];
   content: SiteContent;
+  clientLogoUrls?: (string | null)[];
 }
 
-export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageUrl, pricingTiers, content }: MarketingCourseLandingProps) {
+export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageUrl, pricingTiers, content, clientLogoUrls }: MarketingCourseLandingProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -98,7 +109,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const { header, hero, benefits, about, pricing, reviews: reviewsContent, cta, footer } = content;
+  const { header, hero, usp, benefits, targetAudience, curriculum, about, pricing, reviews: reviewsContent, cta, footer } = content;
 
   const avgRating =
     reviews.length > 0
@@ -136,6 +147,16 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
     closeMobileMenu();
   };
 
+  const videoEmbedUrl = parseVideoEmbedUrl(about.videoUrl);
+  const hasAnyCaseStudy = about.caseStudy1Client || about.caseStudy2Client || about.caseStudy3Client;
+  const activeLogos = (clientLogoUrls || []).filter(Boolean) as string[];
+
+  const caseStudies = [
+    { client: about.caseStudy1Client, result: about.caseStudy1Result },
+    { client: about.caseStudy2Client, result: about.caseStudy2Result },
+    { client: about.caseStudy3Client, result: about.caseStudy3Result },
+  ].filter((cs) => cs.client);
+
   return (
     <div className="min-h-screen bg-[#0f0a1f] text-white selection:bg-[#fb7185] selection:text-white overflow-x-hidden relative">
       <BackgroundEffects shouldAnimate={shouldAnimate} />
@@ -160,12 +181,10 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
 
           <nav className="hidden md:flex items-center gap-8" aria-label="Основна навігація">
             <NavLink href="#benefits">{header.navBenefits}</NavLink>
+            <NavLink href="#curriculum">{header.navCurriculum}</NavLink>
             <NavLink href="#about">{header.navAbout}</NavLink>
             <NavLink href="#pricing">{header.navPricing}</NavLink>
             <NavLink href="#reviews">{header.navReviews}</NavLink>
-            <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-full text-sm font-semibold transition-all">
-              {header.loginButton}
-            </button>
           </nav>
 
           <button
@@ -193,6 +212,9 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
           >
             <NavLink href="#benefits" onClick={closeMobileMenu}>
               {header.navBenefits}
+            </NavLink>
+            <NavLink href="#curriculum" onClick={closeMobileMenu}>
+              {header.navCurriculum}
             </NavLink>
             <NavLink href="#about" onClick={closeMobileMenu}>
               {header.navAbout}
@@ -332,14 +354,51 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
           </motion.div>
         </motion.section>
 
+        {/* USP Highlights Section */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          variants={createSlideVariants('right')}
+          viewport={{ once: true, amount: 0.2 }}
+          className="py-16 sm:py-24 bg-[#1a0d2e]/30 relative overflow-hidden"
+        >
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">{usp.heading}</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">{usp.subtitle}</p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {usp.cards.map((card, i) => {
+                const Icon = USP_ICONS[i] || Zap;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.15 }}
+                    viewport={{ once: true }}
+                    className="bg-[#1a0d2e]/50 border border-purple-500/20 p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group text-center"
+                  >
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-tr from-[#d946ef]/20 to-[#fb7185]/20 flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                      <Icon className="w-7 h-7 text-[#fb7185]" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{card.description}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.section>
+
         {/* Benefits Grid */}
         <motion.section
           id="benefits"
           initial="hidden"
           whileInView="visible"
-          variants={createSlideVariants('right')}
+          variants={createSlideVariants('left')}
           viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/30 relative overflow-hidden"
+          className="py-16 sm:py-24 lg:py-32 relative overflow-hidden"
         >
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-16">
@@ -364,12 +423,89 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
           </div>
         </motion.section>
 
+        {/* Target Audience Section */}
+        <motion.section
+          id="target-audience"
+          initial="hidden"
+          whileInView="visible"
+          variants={createSlideVariants('right')}
+          viewport={{ once: true, amount: 0.2 }}
+          className="py-16 sm:py-24 lg:py-32 container mx-auto px-6 overflow-hidden"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">
+              {targetAudience.heading}
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              {targetAudience.subtitle}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            {targetAudience.cards.map((card, i) => {
+              const Icon = PERSONA_ICONS[i] || Zap;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-[#1a0d2e]/50 border border-purple-500/20 p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon className="w-6 h-6 text-[#a855f7]" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{card.title}</h3>
+                  <p className="text-gray-300 text-sm leading-relaxed">{card.description}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.section>
+
+        {/* Course Curriculum Section */}
+        <motion.section
+          id="curriculum"
+          initial="hidden"
+          whileInView="visible"
+          variants={createSlideVariants('left')}
+          viewport={{ once: true, amount: 0.2 }}
+          className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/30 relative overflow-hidden"
+        >
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">{curriculum.heading}</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">{curriculum.subtitle}</p>
+            </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {curriculum.modules.map((mod, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  viewport={{ once: true }}
+                  className="flex gap-4 sm:gap-6 items-start bg-[#1a0d2e]/50 border border-purple-500/20 p-5 sm:p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-[#d946ef] to-[#fb7185] flex items-center justify-center font-bold text-lg sm:text-xl">
+                    {i + 1}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-1">{mod.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{mod.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
         {/* About/Instructor Section */}
         <motion.section
           id="about"
           initial="hidden"
           whileInView="visible"
-          variants={createSlideVariants('left')}
+          variants={createSlideVariants('right')}
           viewport={{ once: true, amount: 0.2 }}
           className="py-16 sm:py-24 lg:py-32 container mx-auto px-6 overflow-hidden"
         >
@@ -432,6 +568,54 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
                   &ldquo;{about.quote}&rdquo;
                 </p>
               </div>
+
+              {/* Case Studies */}
+              {hasAnyCaseStudy && (
+                <div className="grid sm:grid-cols-3 gap-4 mb-8">
+                  {caseStudies.map((cs, i) => (
+                    <div
+                      key={i}
+                      className="bg-[#1a0d2e]/50 border border-purple-500/20 p-4 rounded-xl"
+                    >
+                      <div className="text-sm font-semibold text-[#fb7185] mb-1">{cs.client}</div>
+                      <div className="text-sm text-gray-300">{cs.result}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Client Logos */}
+              {activeLogos.length > 0 && (
+                <div className="flex flex-wrap items-center gap-6 mb-8">
+                  {activeLogos.map((url, i) => (
+                    <div key={i} className="relative w-20 h-12 grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100">
+                      <Image
+                        src={url}
+                        alt={`Клієнт ${i + 1}`}
+                        fill
+                        sizes="80px"
+                        className="object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Video Embed */}
+              {videoEmbedUrl && (
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 mb-8">
+                  <iframe
+                    src={videoEmbedUrl}
+                    title="Відео-знайомство з інструктором"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    className="absolute inset-0 w-full h-full"
+                  />
+                </div>
+              )}
+
               <button
                 onClick={scrollToPricing}
                 className="px-8 py-4 bg-gradient-to-r from-[#d946ef] to-[#fb7185] rounded-xl font-bold hover:scale-[1.02] transition-transform"
@@ -447,7 +631,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
           id="pricing"
           initial="hidden"
           whileInView="visible"
-          variants={createSlideVariants('right')}
+          variants={createSlideVariants('left')}
           viewport={{ once: true, amount: 0.2 }}
           className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/40 relative"
         >
@@ -479,78 +663,33 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
         </motion.section>}
 
         {/* Testimonials */}
-        <motion.section
-          id="reviews"
-          initial="hidden"
-          whileInView="visible"
-          variants={createSlideVariants('left')}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 lg:py-32 container mx-auto px-6"
-        >
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">{reviewsContent.heading}</h2>
-            {reviews.length > 0 && (
+        {reviews.length > 0 && (
+          <motion.section
+            id="reviews"
+            initial="hidden"
+            whileInView="visible"
+            variants={createSlideVariants('right')}
+            viewport={{ once: true, amount: 0.2 }}
+            className="py-16 sm:py-24 lg:py-32"
+          >
+            <div className="container mx-auto px-6 text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">{reviewsContent.heading}</h2>
               <div className="flex items-center justify-center gap-1 mb-8">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
                 ))}
                 <span className="ml-2 font-bold text-xl">{avgRating}/5</span>
               </div>
-            )}
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {reviews.map((t, i) => (
-              <motion.div
-                key={t.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-[#1a0d2e]/60 border border-white/5 p-8 rounded-3xl relative"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  {t.author_photo_url && (t.author_photo_url.startsWith('/') || t.author_photo_url.startsWith('http')) ? (
-                    <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] p-0.5 overflow-hidden relative">
-                      <Image
-                        src={t.author_photo_url}
-                        alt={`Фото ${t.author_name}`}
-                        fill
-                        sizes="56px"
-                        className="rounded-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 rounded-full border-2 border-[#a855f7] bg-gradient-to-br from-[#d946ef] to-[#fb7185] flex items-center justify-center text-white font-bold text-lg">
-                      {t.author_name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <h4 className="font-bold text-lg">{t.author_name}</h4>
-                    {t.business && (
-                      <p className="text-sm text-gray-500">{t.business}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="mb-4 text-gray-300 leading-relaxed italic">
-                  &ldquo;{t.text}&rdquo;
-                </div>
-                {t.result && (
-                  <div className="pt-4 border-t border-white/5">
-                    <div className="text-[#fb7185] font-bold text-sm uppercase">
-                      {t.result}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+            </div>
+            <ReviewsCarousel reviews={reviews} />
+          </motion.section>
+        )}
 
         {/* CTA Section */}
         <motion.section
           initial="hidden"
           whileInView="visible"
-          variants={createSlideVariants('right')}
+          variants={createSlideVariants('left')}
           viewport={{ once: true, amount: 0.2 }}
           className="py-16 sm:py-24 lg:py-32 px-6"
         >
@@ -596,7 +735,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
       <motion.footer
         initial="hidden"
         whileInView="visible"
-        variants={createSlideVariants('left')}
+        variants={createSlideVariants('right')}
         viewport={{ once: true, amount: 0.2 }}
         className="py-20 border-t border-white/5 relative z-10"
       >
