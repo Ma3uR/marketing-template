@@ -5,11 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Loader2, RotateCcw, Save, Check } from 'lucide-react';
 import GlassCard from './GlassCard';
-import type {
-  SiteContent,
-  SeoContent,
-  BenefitsContent,
-} from '@/types/content';
+import ImageUploader from './ImageUploader';
+import type { SiteContent, SeoContent } from '@/types/content';
 import {
   defaultHeader,
   defaultHero,
@@ -20,19 +17,38 @@ import {
   defaultCta,
   defaultFooter,
   defaultSeo,
+  defaultTargetAudience,
+  defaultUsp,
+  defaultCurriculum,
 } from '@/lib/content-defaults';
 
 interface ContentEditorProps {
   initialContent: SiteContent;
   initialSeo: SeoContent;
+  ogImageUrl: string | null;
 }
 
-type TabId = 'header' | 'hero' | 'benefits' | 'about' | 'pricing' | 'reviews' | 'cta' | 'footer' | 'seo';
+type TabId =
+  | 'header'
+  | 'hero'
+  | 'usp'
+  | 'benefits'
+  | 'curriculum'
+  | 'targetAudience'
+  | 'about'
+  | 'pricing'
+  | 'reviews'
+  | 'cta'
+  | 'footer'
+  | 'seo';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'header', label: 'Header' },
   { id: 'hero', label: 'Hero' },
+  { id: 'usp', label: 'USP' },
   { id: 'benefits', label: 'Переваги' },
+  { id: 'curriculum', label: 'Програма' },
+  { id: 'targetAudience', label: 'Для кого' },
   { id: 'about', label: 'Про автора' },
   { id: 'pricing', label: 'Тарифи' },
   { id: 'reviews', label: 'Відгуки' },
@@ -53,6 +69,7 @@ const FIELD_CONFIGS: Record<string, FieldConfig[]> = {
     { key: 'logoLetter', label: 'Літера логотипу', type: 'input', maxLength: 5 },
     { key: 'brandName', label: 'Назва бренду', type: 'input', maxLength: 120 },
     { key: 'navBenefits', label: 'Навігація: Переваги', type: 'input', maxLength: 40 },
+    { key: 'navCurriculum', label: 'Навігація: Програма', type: 'input', maxLength: 40 },
     { key: 'navAbout', label: 'Навігація: Про автора', type: 'input', maxLength: 40 },
     { key: 'navPricing', label: 'Навігація: Тарифи', type: 'input', maxLength: 40 },
     { key: 'navReviews', label: 'Навігація: Відгуки', type: 'input', maxLength: 40 },
@@ -72,7 +89,19 @@ const FIELD_CONFIGS: Record<string, FieldConfig[]> = {
     { key: 'leadsLabel', label: 'Ліди - мітка', type: 'input', maxLength: 40 },
     { key: 'leadsValue', label: 'Ліди - значення', type: 'input', maxLength: 40 },
   ],
+  usp: [
+    { key: 'heading', label: 'Заголовок секції', type: 'input', maxLength: 120 },
+    { key: 'subtitle', label: 'Підзаголовок секції', type: 'textarea', maxLength: 500 },
+  ],
   benefits: [
+    { key: 'heading', label: 'Заголовок секції', type: 'input', maxLength: 120 },
+    { key: 'subtitle', label: 'Підзаголовок секції', type: 'textarea', maxLength: 500 },
+  ],
+  curriculum: [
+    { key: 'heading', label: 'Заголовок секції', type: 'input', maxLength: 120 },
+    { key: 'subtitle', label: 'Підзаголовок секції', type: 'textarea', maxLength: 500 },
+  ],
+  targetAudience: [
     { key: 'heading', label: 'Заголовок секції', type: 'input', maxLength: 120 },
     { key: 'subtitle', label: 'Підзаголовок секції', type: 'textarea', maxLength: 500 },
   ],
@@ -131,7 +160,10 @@ const FIELD_CONFIGS: Record<string, FieldConfig[]> = {
 const DB_KEY_MAP: Record<TabId, string> = {
   header: 'content_header',
   hero: 'content_hero',
+  usp: 'content_usp',
   benefits: 'content_benefits',
+  curriculum: 'content_curriculum',
+  targetAudience: 'content_target_audience',
   about: 'content_about',
   pricing: 'content_pricing',
   reviews: 'content_reviews',
@@ -143,7 +175,10 @@ const DB_KEY_MAP: Record<TabId, string> = {
 const DEFAULTS_MAP: Record<TabId, unknown> = {
   header: defaultHeader,
   hero: defaultHero,
+  usp: defaultUsp,
   benefits: defaultBenefits,
+  curriculum: defaultCurriculum,
+  targetAudience: defaultTargetAudience,
   about: defaultAbout,
   pricing: defaultPricing,
   reviews: defaultReviews,
@@ -152,16 +187,43 @@ const DEFAULTS_MAP: Record<TabId, unknown> = {
   seo: defaultSeo,
 };
 
-function getSectionData(
-  tab: TabId,
-  content: SiteContent,
-  seo: SeoContent
-  ): any {
+// Tabs that use card array editors, with their array key and validation limits
+const CARD_ARRAY_TABS: Record<string, {
+  arrayKey: string;
+  sectionTitle: string;
+  labels?: string[];
+  titleMax: number;
+  descMax: number;
+}> = {
+  benefits: { arrayKey: 'cards', sectionTitle: 'Картки переваг', titleMax: 60, descMax: 200 },
+  targetAudience: {
+    arrayKey: 'cards',
+    sectionTitle: 'Картки персон',
+    labels: ['Підприємець', 'Фрілансер', 'SMM-менеджер', 'Зміна кар\'єри'],
+    titleMax: 60,
+    descMax: 200,
+  },
+  usp: {
+    arrayKey: 'cards',
+    sectionTitle: 'USP картки',
+    labels: ['14 днів', 'Гарантія', 'VIP менторство'],
+    titleMax: 60,
+    descMax: 200,
+  },
+  curriculum: {
+    arrayKey: 'modules',
+    sectionTitle: 'Модулі курсу',
+    titleMax: 80,
+    descMax: 300,
+  },
+};
+
+function getSectionData(tab: TabId, content: SiteContent, seo: SeoContent): any {
   if (tab === 'seo') return seo;
   return content[tab];
 }
 
-export default function ContentEditor({ initialContent, initialSeo }: ContentEditorProps) {
+export default function ContentEditor({ initialContent, initialSeo, ogImageUrl }: ContentEditorProps) {
   const router = useRouter();
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<TabId>('header');
@@ -172,7 +234,7 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle');
   const [error, setError] = useState('');
 
-  const currentData = getSectionData(activeTab, content, seo) as Record<string, string | unknown[]>;
+  const currentData = getSectionData(activeTab, content, seo);
 
   const updateField = (key: string, value: string) => {
     if (activeTab === 'seo') {
@@ -186,11 +248,13 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
     setStatus('idle');
   };
 
-  const updateBenefitCard = (index: number, field: 'title' | 'description', value: string) => {
+  const updateCardItem = (arrayKey: string, index: number, field: 'title' | 'description', value: string) => {
+    if (activeTab === 'seo') return;
     setContent((prev) => {
-      const newCards = [...prev.benefits.cards];
-      newCards[index] = { ...newCards[index], [field]: value };
-      return { ...prev, benefits: { ...prev.benefits, cards: newCards } };
+      const section = prev[activeTab] as any;
+      const items = [...(section[arrayKey] as { title: string; description: string }[])];
+      items[index] = { ...items[index], [field]: value };
+      return { ...prev, [activeTab]: { ...section, [arrayKey]: items } };
     });
     setStatus('idle');
   };
@@ -207,11 +271,18 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
       }
     }
 
-    if (activeTab === 'benefits') {
-      for (let i = 0; i < content.benefits.cards.length; i++) {
-        const card = content.benefits.cards[i];
-        if (card.title.length > 60) return `Картка ${i + 1}: заголовок перевищує ліміт у 60 символів`;
-        if (card.description.length > 200) return `Картка ${i + 1}: опис перевищує ліміт у 200 символів`;
+    const cardConfig = CARD_ARRAY_TABS[activeTab];
+    if (cardConfig) {
+      const section = getSectionData(activeTab, content, seo);
+      const items = section[cardConfig.arrayKey] as { title: string; description: string }[];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.title.length > cardConfig.titleMax) {
+          return `Елемент ${i + 1}: заголовок перевищує ліміт у ${cardConfig.titleMax} символів`;
+        }
+        if (item.description.length > cardConfig.descMax) {
+          return `Елемент ${i + 1}: опис перевищує ліміт у ${cardConfig.descMax} символів`;
+        }
       }
     }
 
@@ -285,6 +356,8 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
     }
   };
 
+  const cardConfig = CARD_ARRAY_TABS[activeTab];
+
   return (
     <GlassCard className="!p-8">
       <div className="space-y-8">
@@ -321,22 +394,70 @@ export default function ContentEditor({ initialContent, initialSeo }: ContentEdi
 
         {/* Fields */}
         <div className="space-y-5">
-          {activeTab === 'benefits' ? (
-            <BenefitsEditor
-              data={content.benefits}
-              fields={FIELD_CONFIGS.benefits || []}
-              onUpdateField={updateField}
-              onUpdateCard={updateBenefitCard}
+          {activeTab === 'seo' && (
+            <ImageUploader
+              currentImageUrl={ogImageUrl}
+              fallbackImage=""
+              storagePath="og-image"
+              settingsKey="og_image_url"
+              title="OG Preview зображення"
+              description="Рекомендовано: 1200x630px, JPEG або PNG. Це зображення з'являється при поширенні посилання в соцмережах."
+              bucket="hero-images"
             />
-          ) : (
-            (FIELD_CONFIGS[activeTab] || []).map((field) => (
+          )}
+
+          {/* Section heading/subtitle fields */}
+          {(FIELD_CONFIGS[activeTab] || []).map((field) => {
+            // For card-array tabs, only render heading/subtitle here; the rest goes below
+            if (cardConfig && field.key !== 'heading' && field.key !== 'subtitle') return null;
+            return (
               <FieldInput
                 key={field.key}
                 field={field}
                 value={String(currentData[field.key] ?? '')}
                 onChange={(val) => updateField(field.key, val)}
               />
-            ))
+            );
+          })}
+
+          {/* About tab: group case study fields with a divider */}
+          {activeTab === 'about' && (
+            <div className="pt-4 border-t border-white/10 space-y-5">
+              <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Кейси клієнтів</h4>
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="p-4 bg-white/5 rounded-xl border border-white/5 space-y-3">
+                  <div className="text-xs font-medium text-gray-500">Кейс {n}</div>
+                  <FieldInput
+                    field={{ key: `caseStudy${n}Client`, label: 'Клієнт', type: 'input', maxLength: 120 }}
+                    value={String(currentData[`caseStudy${n}Client`] ?? '')}
+                    onChange={(val) => updateField(`caseStudy${n}Client`, val)}
+                  />
+                  <FieldInput
+                    field={{ key: `caseStudy${n}Result`, label: 'Результат', type: 'input', maxLength: 200 }}
+                    value={String(currentData[`caseStudy${n}Result`] ?? '')}
+                    onChange={(val) => updateField(`caseStudy${n}Result`, val)}
+                  />
+                </div>
+              ))}
+              <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider pt-4">Відео</h4>
+              <FieldInput
+                field={{ key: 'videoUrl', label: 'URL відео-знайомства (YouTube/Vimeo)', type: 'input', maxLength: 500 }}
+                value={String(currentData.videoUrl ?? '')}
+                onChange={(val) => updateField('videoUrl', val)}
+              />
+            </div>
+          )}
+
+          {/* Generic card array editor for benefits, targetAudience, usp, curriculum */}
+          {cardConfig && (
+            <CardArrayEditor
+              items={(currentData[cardConfig.arrayKey] as { title: string; description: string }[]) || []}
+              sectionTitle={cardConfig.sectionTitle}
+              labels={cardConfig.labels}
+              titleMaxLength={cardConfig.titleMax}
+              descMaxLength={cardConfig.descMax}
+              onUpdateItem={(index, field, value) => updateCardItem(cardConfig.arrayKey, index, field, value)}
+            />
           )}
         </div>
 
@@ -413,51 +534,41 @@ function FieldInput({
   );
 }
 
-function BenefitsEditor({
-  data,
-  fields,
-  onUpdateField,
-  onUpdateCard,
+function CardArrayEditor({
+  items,
+  sectionTitle,
+  labels,
+  titleMaxLength,
+  descMaxLength,
+  onUpdateItem,
 }: {
-  data: BenefitsContent;
-  fields: FieldConfig[];
-  onUpdateField: (key: string, value: string) => void;
-  onUpdateCard: (index: number, field: 'title' | 'description', value: string) => void;
+  items: { title: string; description: string }[];
+  sectionTitle: string;
+  labels?: string[];
+  titleMaxLength: number;
+  descMaxLength: number;
+  onUpdateItem: (index: number, field: 'title' | 'description', value: string) => void;
 }) {
   return (
-    <div className="space-y-6">
-      {/* Section heading/subtitle */}
-      {fields.map((field) => {
-        if (field.key !== 'heading' && field.key !== 'subtitle') return null;
-        return (
-          <FieldInput
-            key={field.key}
-            field={field}
-            value={String((data as unknown as Record<string, unknown>)[field.key] ?? '')}
-            onChange={(val) => onUpdateField(field.key, val)}
-          />
-        );
-      })}
-
-      {/* Benefit cards */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Картки переваг</h4>
-        {data.cards.map((card, i) => (
-          <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 space-y-3">
-            <div className="text-xs font-medium text-gray-500">Картка {i + 1}</div>
-            <FieldInput
-              field={{ key: `card_${i}_title`, label: 'Заголовок', type: 'input', maxLength: 60 }}
-              value={card.title}
-              onChange={(val) => onUpdateCard(i, 'title', val)}
-            />
-            <FieldInput
-              field={{ key: `card_${i}_desc`, label: 'Опис', type: 'textarea', maxLength: 200 }}
-              value={card.description}
-              onChange={(val) => onUpdateCard(i, 'description', val)}
-            />
+    <div className="space-y-4">
+      <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">{sectionTitle}</h4>
+      {items.map((item, i) => (
+        <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/5 space-y-3">
+          <div className="text-xs font-medium text-gray-500">
+            {labels?.[i] || `${sectionTitle.replace(/Картки |Модулі /, '')} ${i + 1}`}
           </div>
-        ))}
-      </div>
+          <FieldInput
+            field={{ key: `item_${i}_title`, label: 'Заголовок', type: 'input', maxLength: titleMaxLength }}
+            value={item.title}
+            onChange={(val) => onUpdateItem(i, 'title', val)}
+          />
+          <FieldInput
+            field={{ key: `item_${i}_desc`, label: 'Опис', type: 'textarea', maxLength: descMaxLength }}
+            value={item.description}
+            onChange={(val) => onUpdateItem(i, 'description', val)}
+          />
+        </div>
+      ))}
     </div>
   );
 }

@@ -12,6 +12,9 @@ import {
   defaultReviews,
   defaultCta,
   defaultFooter,
+  defaultTargetAudience,
+  defaultUsp,
+  defaultCurriculum,
 } from './content-defaults';
 
 type SupabaseInstance = SupabaseClient<Database>;
@@ -19,12 +22,15 @@ type SupabaseInstance = SupabaseClient<Database>;
 const CONTENT_KEYS = [
   'content_header',
   'content_hero',
+  'content_usp',
   'content_benefits',
   'content_about',
   'content_pricing',
   'content_reviews',
   'content_cta',
   'content_footer',
+  'content_target_audience',
+  'content_curriculum',
 ] as const;
 
 type ContentKey = (typeof CONTENT_KEYS)[number];
@@ -32,12 +38,15 @@ type ContentKey = (typeof CONTENT_KEYS)[number];
 const defaultsMap: Record<ContentKey, unknown> = {
   content_header: defaultHeader,
   content_hero: defaultHero,
+  content_usp: defaultUsp,
   content_benefits: defaultBenefits,
   content_about: defaultAbout,
   content_pricing: defaultPricing,
   content_reviews: defaultReviews,
   content_cta: defaultCta,
   content_footer: defaultFooter,
+  content_target_audience: defaultTargetAudience,
+  content_curriculum: defaultCurriculum,
 };
 
 function safeJsonParse(value: string, fallback: unknown): Record<string, unknown> {
@@ -102,12 +111,15 @@ export async function fetchSiteContent(supabase: SupabaseInstance): Promise<Site
   return {
     header: mergeSection('content_header'),
     hero: mergeSection('content_hero'),
+    usp: mergeSection('content_usp'),
     benefits: mergeSection('content_benefits'),
     about: mergeSection('content_about'),
     pricing: mergeSection('content_pricing'),
     reviews: mergeSection('content_reviews'),
     cta: mergeSection('content_cta'),
     footer: mergeSection('content_footer'),
+    targetAudience: mergeSection('content_target_audience'),
+    curriculum: mergeSection('content_curriculum'),
   };
 }
 

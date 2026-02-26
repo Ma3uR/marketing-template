@@ -9,12 +9,16 @@ import type {
   FooterContent,
   SeoContent,
   SiteContent,
+  TargetAudienceContent,
+  UspContent,
+  CurriculumContent,
 } from '@/types/content';
 
 export const defaultHeader: HeaderContent = {
   logoLetter: 'Т',
   brandName: 'Таня Сідоренко',
   navBenefits: 'Переваги',
+  navCurriculum: 'Програма',
   navAbout: 'Про автора',
   navPricing: 'Тарифи',
   navReviews: 'Відгуки',
@@ -88,6 +92,13 @@ export const defaultAbout: AboutContent = {
   ctaButton: 'Хочу навчатись у тебе',
   experienceYears: '7 років',
   experienceLabel: 'Досвіду в Digital',
+  caseStudy1Client: 'Інтернет-магазин одягу',
+  caseStudy1Result: 'Зменшили вартість ліда з 25₴ до 8₴ за 3 тижні',
+  caseStudy2Client: 'Стоматологічна клініка',
+  caseStudy2Result: 'Збільшили кількість записів на 180% за місяць',
+  caseStudy3Client: 'Онлайн-школа англійської',
+  caseStudy3Result: 'ROI рекламних кампаній зріс до 340%',
+  videoUrl: '',
 };
 
 export const defaultPricing: PricingContent = {
@@ -127,6 +138,98 @@ export const defaultFooter: FooterContent = {
   offerLink: 'Договір оферти',
 };
 
+export const defaultTargetAudience: TargetAudienceContent = {
+  heading: 'Для кого цей курс',
+  subtitle: 'Курс підходить кожному, хто хоче навчитися залучати клієнтів через таргетовану рекламу',
+  cards: [
+    {
+      title: 'Підприємець',
+      description:
+        'Хочеш самостійно запускати рекламу і не переплачувати агенціям? Цей курс дасть тобі повний контроль над маркетинговим бюджетом.',
+    },
+    {
+      title: 'Фрілансер',
+      description:
+        'Мрієш додати таргет до своїх послуг і заробляти більше? Отримай навички, які клієнти готові оплачувати.',
+    },
+    {
+      title: 'SMM-менеджер',
+      description:
+        'Хочеш вирости від постингу до повноцінного digital-маркетолога? Таргет — твій наступний рівень.',
+    },
+    {
+      title: 'Зміна кар\'єри',
+      description:
+        'Шукаєш нову професію з високим попитом? Таргетолог — одна з найзатребуваніших спеціальностей у digital.',
+    },
+  ],
+};
+
+export const defaultUsp: UspContent = {
+  heading: 'Чому обирають наш курс',
+  subtitle: 'Унікальні переваги, яких немає в жодного конкурента',
+  cards: [
+    {
+      title: '14 днів інтенсиву',
+      description:
+        'Те, що інші розтягують на 2-2.5 місяці, ми конденсуємо в 14 інтенсивних днів практичного навчання.',
+    },
+    {
+      title: 'Гарантія повернення коштів',
+      description:
+        'Якщо перший урок не виправдає твоїх очікувань — ми повернемо кошти без зайвих питань.',
+    },
+    {
+      title: 'VIP персональне менторство',
+      description:
+        'Персональний доступ до інструктора, ексклюзивна підтримка та індивідуальна стратегія для твого бізнесу.',
+    },
+  ],
+};
+
+export const defaultCurriculum: CurriculumContent = {
+  heading: 'Програма курсу',
+  subtitle:
+    'Покрокова програма з 7 модулів — від основ до запуску прибуткових кампаній',
+  modules: [
+    {
+      title: 'Основи таргетованої реклами',
+      description:
+        'Як працює рекламний аукціон, структура кабінету, типи кампаній та їх цілі.',
+    },
+    {
+      title: 'Аналіз цільової аудиторії',
+      description:
+        'Сегментація аудиторії, створення портрета клієнта, інструменти дослідження.',
+    },
+    {
+      title: 'Створення рекламних креативів',
+      description:
+        'Формули заголовків, дизайн банерів, A/B тестування візуалів та текстів.',
+    },
+    {
+      title: 'Налаштування Facebook Ads Manager',
+      description:
+        'Піксель, конверсії, каталог, ретаргетинг та lookalike аудиторії.',
+    },
+    {
+      title: 'Бюджетування та оптимізація',
+      description:
+        'Розподіл бюджету, ставки, масштабування успішних кампаній.',
+    },
+    {
+      title: 'Аналітика та звітність',
+      description:
+        'Ключові метрики, UTM-мітки, Google Analytics та оцінка ROI.',
+    },
+    {
+      title: 'Запуск реальної кампанії',
+      description:
+        'Практичне завдання: створення та запуск рекламної кампанії для свого бізнесу.',
+    },
+  ],
+};
+
 export const defaultSeo: SeoContent = {
   title: 'Курс з таргетованої реклами | Таня Сідоренко',
   description:
@@ -141,10 +244,13 @@ export const defaultSeo: SeoContent = {
 export const defaultSiteContent: SiteContent = {
   header: defaultHeader,
   hero: defaultHero,
+  usp: defaultUsp,
   benefits: defaultBenefits,
   about: defaultAbout,
   pricing: defaultPricing,
   reviews: defaultReviews,
   cta: defaultCta,
   footer: defaultFooter,
+  targetAudience: defaultTargetAudience,
+  curriculum: defaultCurriculum,
 };

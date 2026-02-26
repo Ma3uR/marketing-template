@@ -38,3 +38,8 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #3b1d8f #0f0a1f;
 }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

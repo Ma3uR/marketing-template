@@ -2,6 +2,7 @@ export interface HeaderContent {
   logoLetter: string;
   brandName: string;
   navBenefits: string;
+  navCurriculum: string;
   navAbout: string;
   navPricing: string;
   navReviews: string;
@@ -46,6 +47,13 @@ export interface AboutContent {
   ctaButton: string;
   experienceYears: string;
   experienceLabel: string;
+  caseStudy1Client: string;
+  caseStudy1Result: string;
+  caseStudy2Client: string;
+  caseStudy2Result: string;
+  caseStudy3Client: string;
+  caseStudy3Result: string;
+  videoUrl: string;
 }
 
 export interface PricingContent {
@@ -82,6 +90,39 @@ export interface FooterContent {
   offerLink: string;
 }
 
+export interface PersonaCard {
+  title: string;
+  description: string;
+}
+
+export interface TargetAudienceContent {
+  heading: string;
+  subtitle: string;
+  cards: PersonaCard[];
+}
+
+export interface UspCard {
+  title: string;
+  description: string;
+}
+
+export interface UspContent {
+  heading: string;
+  subtitle: string;
+  cards: UspCard[];
+}
+
+export interface CurriculumModule {
+  title: string;
+  description: string;
+}
+
+export interface CurriculumContent {
+  heading: string;
+  subtitle: string;
+  modules: CurriculumModule[];
+}
+
 export interface SeoContent {
   title: string;
   description: string;
@@ -93,10 +134,13 @@ export interface SeoContent {
 export interface SiteContent {
   header: HeaderContent;
   hero: HeroContent;
+  usp: UspContent;
   benefits: BenefitsContent;
   about: AboutContent;
   pricing: PricingContent;
   reviews: ReviewsContent;
   cta: CtaContent;
   footer: FooterContent;
+  targetAudience: TargetAudienceContent;
+  curriculum: CurriculumContent;
 }
