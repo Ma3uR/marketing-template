@@ -12,24 +12,13 @@ import {
   Star,
   ArrowRight,
   ShieldCheck,
-  Zap,
-  Target,
-  Wallet,
-  Cpu,
-  Headphones,
-  Rocket,
   Menu,
   X,
-  Briefcase,
-  Laptop,
-  Megaphone,
-  GraduationCap,
-  Crown,
-  Clock,
 } from 'lucide-react';
 import { PricingCard } from './PricingCard';
 import { BackgroundEffects } from './BackgroundEffects';
 import { ReviewsCarousel } from './ReviewsCarousel';
+import { CourseDetailsSection } from './CourseDetailsSection';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { parseVideoEmbedUrl } from '@/lib/video';
@@ -53,36 +42,6 @@ const NavLink = ({
     {children}
   </a>
 );
-
-const BenefitCardComponent = ({
-  icon: Icon,
-  title,
-  description,
-  delay,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  delay: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay }}
-    viewport={{ once: true }}
-    className="bg-[#1a0d2e]/50 border border-purple-500/20 p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group"
-  >
-    <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-      <Icon className="w-6 h-6 text-[#a855f7]" />
-    </div>
-    <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-    <p className="text-gray-300 text-sm leading-relaxed">{description}</p>
-  </motion.div>
-);
-
-const BENEFIT_ICONS = [Rocket, Target, Wallet, Cpu, Headphones, Zap];
-const PERSONA_ICONS = [Briefcase, Laptop, Megaphone, GraduationCap];
-const USP_ICONS = [Clock, ShieldCheck, Crown];
 
 interface MarketingCourseLandingProps {
   reviews: Review[];
@@ -158,7 +117,7 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
   ].filter((cs) => cs.client);
 
   return (
-    <div className="min-h-screen bg-[#0f0a1f] text-white selection:bg-[#fb7185] selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#0f0a1f] text-white selection:bg-[#fb7185] selection:text-white [overflow-x:clip] relative">
       <BackgroundEffects shouldAnimate={shouldAnimate} />
 
       {/* Header */}
@@ -354,151 +313,13 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
           </motion.div>
         </motion.section>
 
-        {/* USP Highlights Section */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          variants={createSlideVariants('right')}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 bg-[#1a0d2e]/30 relative overflow-hidden"
-        >
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">{usp.heading}</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">{usp.subtitle}</p>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {usp.cards.map((card, i) => {
-                const Icon = USP_ICONS[i] || Zap;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.15 }}
-                    viewport={{ once: true }}
-                    className="bg-[#1a0d2e]/50 border border-purple-500/20 p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group text-center"
-                  >
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-tr from-[#d946ef]/20 to-[#fb7185]/20 flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                      <Icon className="w-7 h-7 text-[#fb7185]" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{card.description}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Benefits Grid */}
-        <motion.section
-          id="benefits"
-          initial="hidden"
-          whileInView="visible"
-          variants={createSlideVariants('left')}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 lg:py-32 relative overflow-hidden"
-        >
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">
-                {benefits.heading}
-              </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">
-                {benefits.subtitle}
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {benefits.cards.map((card, i) => (
-                <BenefitCardComponent
-                  key={i}
-                  icon={BENEFIT_ICONS[i] || Zap}
-                  title={card.title}
-                  description={card.description}
-                  delay={i * 0.1}
-                />
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Target Audience Section */}
-        <motion.section
-          id="target-audience"
-          initial="hidden"
-          whileInView="visible"
-          variants={createSlideVariants('right')}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 lg:py-32 container mx-auto px-6 overflow-hidden"
-        >
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
-              {targetAudience.heading}
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              {targetAudience.subtitle}
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            {targetAudience.cards.map((card, i) => {
-              const Icon = PERSONA_ICONS[i] || Zap;
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-[#1a0d2e]/50 border border-purple-500/20 p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6 text-[#a855f7]" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{card.title}</h3>
-                  <p className="text-gray-300 text-sm leading-relaxed">{card.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.section>
-
-        {/* Course Curriculum Section */}
-        <motion.section
-          id="curriculum"
-          initial="hidden"
-          whileInView="visible"
-          variants={createSlideVariants('left')}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 sm:py-24 lg:py-32 bg-[#1a0d2e]/30 relative overflow-hidden"
-        >
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">{curriculum.heading}</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">{curriculum.subtitle}</p>
-            </div>
-            <div className="max-w-3xl mx-auto space-y-4">
-              {curriculum.modules.map((mod, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  viewport={{ once: true }}
-                  className="flex gap-4 sm:gap-6 items-start bg-[#1a0d2e]/50 border border-purple-500/20 p-5 sm:p-6 rounded-2xl backdrop-blur-sm hover:border-purple-500/40 transition-all group"
-                >
-                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-[#d946ef] to-[#fb7185] flex items-center justify-center font-bold text-lg sm:text-xl">
-                    {i + 1}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">{mod.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{mod.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
+        {/* Course Details — scroll-driven sticky section */}
+        <CourseDetailsSection
+          benefits={benefits}
+          curriculum={curriculum}
+          targetAudience={targetAudience}
+          usp={usp}
+        />
 
         {/* About/Instructor Section */}
         <motion.section
@@ -699,14 +520,14 @@ export function MarketingCourseLanding({ reviews, heroImageUrl, instructorImageU
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-r from-[#3b1d8f] to-[#1a0d2e] rounded-[3rem] p-12 lg:p-20 text-center relative overflow-hidden border border-white/10"
+              className="bg-gradient-to-r from-[#3b1d8f] to-[#1a0d2e] rounded-[2rem] sm:rounded-[3rem] p-8 sm:p-12 lg:p-20 text-center relative overflow-hidden border border-white/10"
             >
               <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
               <div className="relative z-10">
-                <h2 className="text-4xl lg:text-6xl font-bold mb-8 max-w-4xl mx-auto leading-tight">
+                <h2 className="text-2xl sm:text-4xl lg:text-6xl font-bold mb-6 sm:mb-8 max-w-4xl mx-auto leading-tight">
                   {cta.heading}
                 </h2>
-                <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+                <p className="text-base sm:text-xl text-gray-300 mb-8 sm:mb-12 max-w-2xl mx-auto">
                   {cta.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
